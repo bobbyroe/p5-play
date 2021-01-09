@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s linear infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let lines = [];
+      let newLine = [];
+      let previousPos = { x: 0, y: 0 };
+      function setup() {
+        noStroke();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        strokeWeight(2);
+        stroke(90, 0, 255);
+      }
+
+      // continuous loop
+      function draw() {
+        let { x, y } = previousPos; 
+        if (keyIsDown(32)) {
+          newLine.push({
+            x: mouseX,
+            y: mouseY
+          });
+          line(x, y, mouseX, mouseY);
+        }
+        previousPos = { x: mouseX, y: mouseY };
+      }
+
+      function keyPressed() {
+        if (keyCode === 88) {
+          // x
+          console.log(positions);
+          positions = [];
+          clear();
+        }
+        if (keyCode === 68) {
+          // d (as in DRAW)
+        }
+      }
+      function keyReleased() {
+        if (keyCode === 32) {
+          lines.push(newLine);
+          newLine = [];
+        }
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
+<!--
+  // add undo ?
+-->

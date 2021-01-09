@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+
+      let paused = false;
+      let middle = { x: 0, y: 0 };
+      let delta = { x: 0, y: 0 };
+      let goalPos = { x: 0, y: 0 };
+      let pos = { x: 0, y: 0 };
+      let angle = 0;
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        pos = middle;
+        // angle = PI * 1.5;
+        strokeWeight(2.0);
+        stroke(255, 100, 0);
+      }
+
+      function drawShip(x, y, angle) {
+        push();
+        translate(x, y);
+        rotate(angle);
+        line(10, -15, 0, 15); // /
+        line(0, 15, -10, -15); // \
+        line(10, -15, 0, -9); // /
+        line(0, -9, -10, -15); // \
+        pop();
+      }
+
+      function draw() {
+        if (paused === false) {
+          delta = { 
+            x: mouseX - pos.x, 
+            y: mouseY - pos.y 
+          };
+          background(0, 0, 0);
+          angle = atan2(-delta.x, delta.y);
+          pos.x -= (pos.x - mouseX) * 0.1;
+          pos.y -= (pos.y - mouseY) * 0.1;
+          drawShip(pos.x, pos.y, angle);
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

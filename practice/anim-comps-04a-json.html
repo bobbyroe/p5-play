@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 5s linear infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script src="../gsap.min.js"></script>
+    <script>
+      let paused = false;
+
+      let time = 0;
+      let isExpanded = false;
+      let lines;
+      const lineObjs = [];
+
+      function preload() {
+        lines = loadJSON("assets/hulk-lines.json");
+      }
+
+      function getLineObj() {
+        const lines = [];
+        const goalPos = { x: 0, y: 0 };
+        const currentPos = { x: 0, y: 0 };
+        function update () {
+          lines.forEach( l => {
+            const { pos, randomPos } = l; 
+            let { ox, oy, x, y } = pos;
+            goalPos.x = isExpanded ? randomPos.x : x;
+            goalPos.y = isExpanded ? randomPos.y : y;
+            currentPos.x -= (currentPos.x - goalPos.x) * 0.02;
+            currentPos.y -= (currentPos.y - goalPos.y) * 0.02;
+            translate(currentPos.x, currentPos.y);
+            line(ox - currentPos.x, oy - currentPos.y, 0, 0);
+            resetMatrix();
+          });
+        }
+        return {
+          lines,
+          update,
+        };
+      }
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        strokeWeight(2);
+        stroke(90, 0, 255);
+
+        const keys = Object.keys(lines);
+
+        keys.forEach((key, n) => {
+          const l = lines[key];
+          const lineObj = getLineObj();
+          l.forEach((pos, i) => {
+            let { x, y } = pos;
+            let previousPos = l[i - 1];
+            let ox = previousPos ? previousPos.x : pos.x;
+            let oy = previousPos ? previousPos.y : pos.y;
+            const randomPos = { 
+              x: random() < 0.5 ? random(0, -250) : random(windowWidth, windowWidth + 250), 
+              y: random() < 0.5 ? random(0, -250) : random(windowHeight, windowHeight + 250), 
+            };
+            lineObj.lines.push({ pos: { ox, oy, x, y }, randomPos });
+          });
+          lineObjs.push(lineObj);
+        });
+      }
+
+      function draw() {
+        time += 1;
+
+        if (paused === false) {
+          background(0);
+          lineObjs.forEach((l) => l.update());
+        }
+      }
+
+      function keyPressed() {
+        const SPACE = 32;
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        if (keyCode === SPACE) {
+          isExpanded = !isExpanded;
+          time = 0;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

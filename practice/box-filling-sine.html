@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite linear;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let paused = false;
+      const boxes = [];
+      let time = 0;
+      function getBox(props) {
+        let { x, y, size, n } = props;
+        let hue = 280;
+        function update(t) {
+          
+          let hlf;
+          hue = 260 - ( abs(sin(n * 0.3 + t * 0.02)) * 60)
+          if (t > n) {
+            hlf = size * 0.6 * sin(n * 0.3 + t * 0.02);
+            stroke(hue, 255, 255);
+            translate(x, y);
+            line(-hlf, -hlf, hlf, -hlf);
+            line(hlf, -hlf, hlf, hlf);
+            line(hlf, hlf, -hlf, hlf);
+            line(-hlf, hlf, -hlf, -hlf);
+            resetMatrix();
+          }
+        }
+        return {
+          x,
+          y,
+          size,
+          update,
+        };
+      }
+      function stokeBoxes() {
+        const pos = { x: 200, y: 200 };
+        const numCols = 24;
+        const numRows = 24;
+        const size = 40;
+        const gap = 0;
+        let x, y;
+        let n = 0;
+        for (let r = 0; r < numRows; r += 1) {
+          for (let c = 0; c < numCols; c += 1) {
+            x = pos.x + c * size + c * gap;
+            y = pos.y + r * size + r * gap;
+            n += 1;
+            boxes.push(getBox({ x, y, size, n }));
+          }
+        }
+      }
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        
+        strokeWeight(1);
+
+        stokeBoxes();
+      }
+
+      function draw() {
+        background('rgba(0, 0, 0, 1.0)');
+        time += 3;
+        if (paused === false) {
+          boxes.forEach((b) => {
+            b.update(time);
+          });
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

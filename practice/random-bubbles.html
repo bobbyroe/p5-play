@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url('assets/space.png');
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let paused = false;
+      let middle;
+      let pos = {x: 0, y: 0};
+      let numCircles = 100;
+      let alpha = 0;
+      function setup() {
+        noFill();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        
+        for (let i = 0; i < numCircles; i++) {
+          // alpha = random(0.2, 0.8);
+          // fill(random(100, 200), 255, 128, alpha);
+          strokeWeight(random(0.5, 10));
+          stroke(random(100, 200), 255, 128);
+          pos.x = random(500, -500) + middle.x;
+          pos.y = random(500, -500) + middle.y;
+          diameter = random(25, 125);
+          circle(pos.x, pos.y, diameter);
+        }
+        
+        // background('rgba(0, 0, 0, 0.5)');
+       
+      }
+      // continuous loop
+      function draw() {
+        if (paused === false) {
+          
+          
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

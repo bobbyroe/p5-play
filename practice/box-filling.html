@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite linear;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let paused = false;
+      const boxes = [];
+      let time = 0;
+      function getBox(props) {
+        let { x, y, hlf, max, n } = props;
+        const rate = 5.5 + random(-0.5, 0.5);
+        let hue = random(210, 260);
+        if (random() > 0.99) {
+          hue = random(0, 80);
+        }
+        const isOutline = random() > 0.95;
+        if (isOutline) { 
+          max *= 0.5;
+          x -= max;
+          y -= max;
+        }
+        function update(t) {
+          if (t > n) {
+            hlf += rate;
+            if (hlf > max) {
+              hlf = max;
+            }
+            
+            translate(x, y);
+            if (isOutline) {
+              stroke(hue, 255, 255);
+              line(-hlf, -hlf, hlf, -hlf);
+              line(hlf, -hlf, hlf, hlf);
+              line(hlf, hlf, -hlf, hlf);
+              line(-hlf, hlf, -hlf, -hlf);
+            } else {
+              fill(hue, 255, 255);
+              rect(-hlf, -hlf, hlf, hlf);
+            }
+
+            
+            resetMatrix();
+          }
+        }
+        return {
+          update,
+        };
+      }
+      function stokeBoxes() {
+        const pos = { x: 200, y: 200 };
+        const numCols = 16;
+        const numRows = 16;
+        const size = 90;
+        const gap = 0;
+        let x, y;
+        let n = 0;
+        for (let r = 0; r < numRows; r += 1) {
+          for (let c = 0; c < numCols; c += 1) {
+            x = pos.x + c * size + c * gap;
+            y = pos.y + r * size + r * gap;
+            n += 1;
+            boxes.push(getBox({ x, y, hlf: 0, max: size, n }));
+          }
+        }
+      }
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        // stroke(0, 255, 255);
+        noStroke();
+        strokeWeight(0.5);
+
+        stokeBoxes();
+      }
+
+      function draw() {
+        // background('rgba(0, 0, 0, 0.08)');
+        time += 1;
+        if (paused === false) {
+          boxes.forEach((b) => {
+            b.update(time);
+          });
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s linear infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let positions = [];
+      const bgEmojis = ["🌑", "👣", "🕶", "⚫️"];
+      const topEmojis = ["✨", "⚡️", "💫"];
+      function setup() {
+        noStroke();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        // colorMode(HSB);
+        textSize(50);
+      }
+
+      function drawEmojiAt(pos, level) {
+        const { x, y, emojis, rotes, sizes } = pos;
+        textSize(sizes[level]);
+        push();
+        translate(x, y);
+        rotate(rotes[level]);
+        text(emojis[level], 0, 0);
+        pop();
+      }
+      
+      function drawBlockAt(pos) {
+        const { x, y } = pos;
+        text("█", x, y);
+      }
+      // continuous loop
+      function draw() {
+        let emojis = ["🖤", "💜", "💙", "💚"];
+        if (keyIsDown(32)) {
+          positions.push({
+            x: mouseX,
+            y: mouseY,        
+            rx: random(-50, 50),
+            ry: random(-50, 50),
+            sizes: [random(150, 400), random(75, 200), random(75, 150), random(20, 75)],
+            rotes: [random(TWO_PI), random(TWO_PI), random(TWO_PI), random(TWO_PI)],
+            emojis,
+          });
+
+          emojis.forEach((e, i) => {
+            positions.forEach((pos) => {
+              drawEmojiAt(pos, i);
+            });
+          });
+        }
+        // background("rgba(0,0,0, 0.01)");
+      }
+
+      function keyPressed() {
+        if (keyCode === 88) {
+          // x
+          erase();
+          positions.forEach((pos) => {
+            drawBlockAt(pos);
+          });
+          noErase();
+          positions = [];
+        }
+        if (keyCode === 68) {
+          // d (as in DRAW)
+        }
+      }
+      function keyReleased() {
+        if (keyCode === 32) {
+          background("rgba(0, 0, 0, 0.1)");
+          positions = [];
+        }
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

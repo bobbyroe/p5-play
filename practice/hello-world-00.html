@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P5</title>
+    <style>
+        body {
+            margin: 10px;
+            padding: 0;
+            background-color: #808080;
+        }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+        
+        function setup() {
+            createCanvas(windowWidth - 20, windowHeight - 20);
+        }
+
+        function draw() {
+            const r = random(255);
+            const g = 0;
+            const b = 0;
+            if (mouseIsPressed) {
+                fill(r, g, b);
+            } else {
+                fill(255);
+            }
+            ellipse(mouseX, mouseY, 80, 80);
+        }
+
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

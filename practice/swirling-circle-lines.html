@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+      let paused = false;
+      let middle;
+      let pos = { x: 0, y: 0 };
+      let numLines = 250;
+      let alpha = 0;
+      const circles = [];
+
+      function makeCircle(n) {
+        let rads = random(TWO_PI);
+        const randomDist = random(10, 600);
+        const pos = {
+          x: middle.x + cos(rads) * randomDist,
+          y: middle.y + sin(rads) * randomDist
+        };
+        const oldPos = {x: pos.x, y: pos.y};
+        let rate = random(0.01, 0.04);
+        return {
+          n,
+          col: { h: randomDist * 0.17 + 180, s: 255, b: randomDist * 0.3, a: 1.0 },
+          pos,
+          oldPos,
+          dist,
+          weight: random(0.5, 1),
+          update() {
+            rads += rate;
+            oldPos.x = pos.x;
+            oldPos.y = pos.y;
+            pos.x = middle.x + cos(rads) * randomDist,
+            pos.y = middle.y + sin(rads) * randomDist
+          },
+        };
+      }
+
+      function setup() {
+        noStroke();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+
+        for (let i = 0; i < numLines; i++) {
+          circles.push(makeCircle(i));
+        }
+        fill(255, 0, 0);
+        circle(middle.x, middle.y, 25);
+      }
+      // continuous loop
+      function draw() {
+        if (paused === false) {
+        //   background("rgba(0, 0, 0, 0.01)");
+          // middle
+          // fill('red');
+          // circle(middle.x, middle.y, 5);
+          //
+          
+          circles.forEach((c) => {
+            const { col, pos, oldPos, n, weight } = c;
+            const { h, s, b, a } = col;
+            stroke(h, s, b, a);
+            strokeWeight(weight);
+            line(oldPos.x, oldPos.y, pos.x, pos.y);
+            c.update();
+          });
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

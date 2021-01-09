@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P5</title>
+    <style>
+        body {
+            margin: 10px;
+            padding: 0;
+            background-color: #202020;
+        }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+        
+        function setup() {
+            createCanvas(windowWidth - 20, windowHeight - 20);
+            textSize(144);
+            textAlign(CENTER, CENTER);
+        }
+
+        function draw() {
+            background('rgba(20, 20, 20, 0.02)');
+            translate(mouseX, mouseY);
+            rotate(millis() * 0.01);
+            text('🍕', 0, 0);
+        }
+
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

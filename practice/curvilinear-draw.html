@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="../p5.min.js"></script>
+    <script>
+
+      let paused = false;
+      let middle = { x: 0, y: 0 };
+      let delta = { x: 0, y: 0 };
+      let goalPos = { x: 0, y: 0 };
+      let pos = { x: 0, y: 0 };
+      let angle = 0;
+      let hue = 0;
+      let goalHue = 0;
+      const speed = 0.3;
+      let time = 50;
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        pos = middle;
+        goalPos = middle;
+        // angle = PI * 1.5;
+        strokeWeight(2.0);
+        colorMode(HSB);
+        hue = 0;
+        goalHue = hue;
+        stroke(hue, 100, 50);
+        noFill();
+      }
+
+      function eraseShip(x, y, angle) {
+        strokeWeight(4.0);
+        erase();
+        push();
+        translate(x, y);
+        rotate(angle);
+        line(10, -15, 0, 15); // /
+        line(0, 15, -10, -15); // \
+        line(10, -15, 0, -9); // /
+        line(0, -9, -10, -15); // \
+        pop();
+        noErase();
+      }
+
+      function drawShip(x, y, angle) {
+        strokeWeight(2.0);
+        push();
+        translate(x, y);
+        rotate(angle);
+        line(10, -15, 0, 15); // /
+        line(0, 15, -10, -15); // \
+        line(10, -15, 0, -9); // /
+        line(0, -9, -10, -15); // \
+        pop();
+      }
+
+      function draw() {
+        let { x, y } = pos;
+        if (paused === false) {
+          time -= 1;
+          delta = { 
+            x: goalPos.x - pos.x, 
+            y: goalPos.y - pos.y 
+          };
+          angle = atan2(-delta.x, delta.y);
+          pos.x -= (pos.x - goalPos.x) * speed;
+          pos.y -= (pos.y - goalPos.y) * speed;
+          hue = lerp(hue, goalHue, time * 0.01);
+          stroke(hue, 100, 50);
+          bezier(x, y, x + random(-200, 200), y + random(-200, 200), pos.x + random(-200, 200), pos.y + random(-200, 200), pos.x, pos.y);
+
+          if (time <= 0) {
+            goalPos = {
+              x: random(middle.x - 50, middle.x + 50),
+              y: random(middle.y - 50, middle.y + 50) 
+            }
+            time = random(1, 15);
+            if ( random() < 0.2) {
+              goalHue = random(100);
+            }
+          }
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
