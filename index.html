@@ -3,35 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>P5</title>
+    <title>P5 Drawing</title>
     <style>
-      html, body {
+      html,
+      body {
         margin: 0;
         padding: 0;
-        
         position: fixed;
         top: 0;
         overflow: hidden;
-      }
+      } 
       body {
         background-color: #202020;
         background: url("assets/space.png");
-        animation: slowspin 25s linear infinite;
       }
-      canvas {
-        display: block;
-        user-select: none;
-        position: absolute;
-        top: 0;
-      }
-      @keyframes slowspin {
-        0% {
-          background-position: 0;
-        }
-        100% {
-          background-position: 100%;
-        }
-      }
+
     </style>
     <script src="libs/p5.min.js"></script>
     <script>
@@ -50,6 +36,7 @@
         stroke(90, 0, 255);
         fill(0, 0, 255);
         textSize(72);
+
         body.addEventListener("pointerdown", (evt) => {
           isDrawing = true;
         });
