@@ -23,7 +23,7 @@
     <script>
       let lines = [];
       let newLine = [];
-      let previousPos;
+      let previousPos = null;
       let body;
       let isDrawing = false;
       function setup() {
@@ -45,8 +45,8 @@
           isDrawing = false;
           lines.push(newLine);
           newLine = [];
-          clear();
-          text(evt.type, 100, 100);
+          // clear();
+          // text(evt.type, 100, 100);
         });
         body.addEventListener("mouseup", (evt) => {
           isDrawing = false;
@@ -60,7 +60,7 @@
 
       // continuous loop
       function draw() {
-        if (previousPos === undefined) {
+        if (previousPos === null) {
           previousPos = { x: mouseX, y: mouseY };
         }
         let { x, y } = previousPos;
