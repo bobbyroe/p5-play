@@ -41,7 +41,14 @@
           isDrawing = true;
           clear();
         });
-        body.addEventListener("pointerup mouseup", (evt) => {
+        body.addEventListener("pointerup", (evt) => {
+          isDrawing = false;
+          lines.push(newLine);
+          newLine = [];
+          clear();
+          text(evt.type, 100, 100);
+        });
+        body.addEventListener("mouseup", (evt) => {
           isDrawing = false;
           lines.push(newLine);
           newLine = [];
