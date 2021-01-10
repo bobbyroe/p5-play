@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>P5</title>
     <style>
-      body {
+      html, body {
         margin: 0;
         padding: 0;
-        background-color: #202020;
-        background: url("assets/space.png");
-        animation: slowspin 25s linear infinite;
+        
         position: fixed;
         top: 0;
         overflow: hidden;
+      }
+      body {
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s linear infinite;
       }
       canvas {
         display: block;
