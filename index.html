@@ -26,45 +26,62 @@
       let lines = [];
       let newLine = [];
       let previousPos = { x: 0, y: 0 };
+      let body;
+      let isDrawing = false;
       function setup() {
+        body = document.body;
         noStroke();
         middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
         createCanvas(windowWidth - 20, windowHeight - 20);
         colorMode(HSB);
         strokeWeight(2);
         stroke(90, 0, 255);
+        fill(0, 0, 255);
+        textSize(72);
+        body.addEventListener("pointerdown", (evt) => {
+          isDrawing = true;
+          console.log(evt);
+          clear();
+          text(evt.type, 100, 100);
+        });
+        body.addEventListener("pointerup", (evt) => {
+          isDrawing = false;
+          console.log(evt);
+          clear();
+          text(evt.type, 100, 100);
+        });
       }
 
       // continuous loop
       function draw() {
-        let { x, y } = previousPos; 
-        if (keyIsDown(32)) {
+        let { x, y } = previousPos;
+        if (isDrawing) {
           newLine.push({
             x: mouseX,
-            y: mouseY
+            y: mouseY,
           });
           line(x, y, mouseX, mouseY);
         }
         previousPos = { x: mouseX, y: mouseY };
       }
 
-      function keyPressed() {
-        if (keyCode === 88) {
-          // x
-          console.log(positions);
-          positions = [];
-          clear();
-        }
-        if (keyCode === 68) {
-          // d (as in DRAW)
-        }
-      }
-      function keyReleased() {
-        if (keyCode === 32) {
-          lines.push(newLine);
-          newLine = [];
-        }
-      }
+      // function keyPressed() {
+      //   if (keyCode === 88) {
+      //     // x
+      //     console.log(positions);
+      //     positions = [];
+      //     clear();
+      //   }
+      //   if (keyCode === 68) {
+      //     // d (as in DRAW)
+      //   }
+      // }
+      // function keyReleased() {
+      //   if (keyCode === 32) {
+      //     lines.push(newLine);
+      //     newLine = [];
+      //   }
+      // }
     </script>
   </head>
   <body></body>
