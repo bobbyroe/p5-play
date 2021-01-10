@@ -6,16 +6,20 @@
     <title>P5</title>
     <style>
       body {
-        margin: 10px;
+        margin: 0;
         padding: 0;
         background-color: #202020;
         background: url("assets/space.png");
         animation: slowspin 25s linear infinite;
+        position: fixed;
+        top: 0;
+        overflow: hidden;
       }
       canvas {
+        display: block;
         user-select: none;
-        position: fixed;
-        overflow-y: hidden;
+        position: absolute;
+        top: 0;
       }
       @keyframes slowspin {
         0% {
