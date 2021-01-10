@@ -39,11 +39,14 @@
 
         body.addEventListener("pointerdown", (evt) => {
           isDrawing = true;
+          clear();
         });
-        body.addEventListener("pointerup", (evt) => {
+        body.addEventListener("pointerup mouseup", (evt) => {
           isDrawing = false;
           lines.push(newLine);
           newLine = [];
+          clear();
+          console.log(evt.type);
         });
       }
 
