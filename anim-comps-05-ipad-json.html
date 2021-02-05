@@ -30,9 +30,10 @@
       let isExpanded = false;
       let lines;
       const lineObjs = [];
+      let numElipses = 0;
 
       function preload() {
-        lines = loadJSON("assets/drawing-data/someshapes.json");
+        lines = loadJSON("assets/drawing-data/boxes.json");
       }
 
       function getLineObj(n) {
@@ -44,25 +45,25 @@
         let goalPos = { x: 0, y: 0 };
         const roteRate = random(0.0005, 0.002);
         function update(t) {
-          // if (t > n) {
-            stroke(hue, 255, 255);
-            goalPos = isExpanded ? randomPos : pos;
-            currentPos.x -= (currentPos.x - goalPos.x) * 0.05;
-            currentPos.y -= (currentPos.y - goalPos.y) * 0.05;
-            push();
-            translate(currentPos.x, currentPos.y);
-            rotate(millis() * roteRate); 
-            // middle point
-            // line(0, 0, 5, 5);
-            // line(5, 0, 0, 5);
-            //
-            lines.forEach((l) => {
-              const { coords } = l;
-              const { ox, oy, x, y } = coords;
-              line(ox - pos.x, oy - pos.y, x - pos.x, y - pos.y);
-            });
-            pop();
-          // } 
+          goalPos = isExpanded ? randomPos : pos;
+          currentPos.x -= (currentPos.x - goalPos.x) * 0.05;
+          currentPos.y -= (currentPos.y - goalPos.y) * 0.05;
+          push();
+          translate(currentPos.x, currentPos.y);
+          // rotate(millis() * roteRate);
+          // middle point
+
+          // ellipse(0, 0, 5);
+          //
+
+          lines.forEach((l) => {
+            const { coords } = l;
+            const { x, y, s } = coords;
+            fill(s * 20, 255, 255);
+            ellipse(x - pos.x, y - pos.y, s);
+            numElipses += 1;
+          });
+          pop();
         }
         return {
           pos,
@@ -76,25 +77,19 @@
       function setup() {
         createCanvas(windowWidth - 20, windowHeight - 20);
         colorMode(HSB);
-        strokeWeight(2);
-        stroke(90, 0, 255);
+        noStroke();
 
         const keys = Object.keys(lines);
 
         keys.forEach((key, n) => {
           const l = lines[key];
           const lineObj = getLineObj(n);
-          const avgPos = {x: 0, y: 0};
+          const avgPos = { x: 0, y: 0 };
           l.forEach((pos, i) => {
-            let { x, y } = pos;
-            let previousPos = l[i - 1];
-            let ox = previousPos ? previousPos.x : pos.x;
-            let oy = previousPos ? previousPos.y : pos.y;
+            let { x, y, s } = pos;
             avgPos.x += x;
             avgPos.y += y;
             if (i === 0) {
-              // lineObj.pos.x = x;
-              // lineObj.pos.y = y;
               if (random() < 0.5) {
                 lineObj.randomPos.x =
                   random() < 0.5
@@ -111,10 +106,10 @@
             }
             lineObj.currentPos.x = x;
             lineObj.currentPos.y = y;
-            lineObj.lines.push({ coords: { ox, oy, x, y, i } });
+            lineObj.lines.push({ coords: { x, y, s, i } });
           }); // end forEach();
           lineObj.pos.x = round(avgPos.x / l.length);
-          lineObj.pos.y  = round(avgPos.y / l.length);
+          lineObj.pos.y = round(avgPos.y / l.length);
           lineObjs.push(lineObj);
         });
       }
@@ -132,6 +127,7 @@
         const SPACE = 32;
         if (keyCode === ESCAPE) {
           paused = !paused;
+          console.log("numElipses", numElipses);
         }
         if (keyCode === SPACE) {
           isExpanded = !isExpanded;
