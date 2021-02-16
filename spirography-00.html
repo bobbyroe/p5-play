@@ -26,35 +26,42 @@
     </style>
     <script src="libs/p5.min.js"></script>
     <script>
-      let mid;
+      let paused = false;
+      let mid = { x: 0, y: 0 };
       function setup() {
         createCanvas(windowWidth - 20, windowHeight - 20);
-        mid = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
         colorMode(HSB);
-        noStroke();
-        fill(0, 100, 100);
+        // angleMode(DEGREES);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
       }
 
-      let paused = false;
-      let x = 0;
-      let y = 0;
-      let radius = 550;
-      let radiusInc = 6;
-      let incMult = 0.001;
+      const ringRadius = 300;
+      const wheelRadius = 100;
+      let counter = 0;
       function draw() {
-        let inc = millis() * incMult;
-        incMult += 0.000005;
+        let x = mid.x;
+        let y = mid.y;
         if (paused === false) {
-          fill(radius * 0.2, 100, 100);
-          x = cos(inc) * radius + mid.x;
-          y = sin(inc) * radius + mid.y;
-          ellipse(x, y, 10);
-
-          radiusInc = max(radiusInc - 0.08, 1);
-          radius -= radiusInc;
-          if (radius < 0) {
-            paused = true;
-          }
+            clear();
+          counter += 0.02;
+          stroke(0, 0, 100);
+          strokeWeight(0.5);
+          circle(mid.x, mid.y, ringRadius * 2 + 10);
+          // inner circle
+          push();
+          stroke(0, 100, wheelRadius);
+          strokeWeight(1);
+          translate(x + cos(counter) * (ringRadius - wheelRadius * 0.5), y + sin(counter) * (ringRadius - wheelRadius * 0.5));
+          rotate(-PI * counter);
+          circle(0, 0, 100);
+          line(0, 0, 50, 0);
+          pop();
         }
       }
 

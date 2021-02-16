@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let letters = [];
+      let spirals = [];
+
+      const fontData = {
+        A: [
+          [0, 40],
+          [0, 0],
+          [40, 0],
+          [40, 40],
+        ],
+        B: [
+          [0, 40],
+          [0, 0],
+          [20, 0],
+          [20, 20],
+          [40, 20],
+          [40, 40],
+          [0, 40],
+        ],
+        C: [
+          [40, 40],
+          [0, 40],
+          [0, 0],
+          [40, 0],
+        ],
+        D: [
+          [0, 40],
+          [0, 0],
+          [20, 0],
+          [40, 20],
+          [40, 40],
+          [0, 40],
+        ],
+        E: [
+          [40, 40],
+          [0, 40],
+          [0, 0],
+          [40, 0],
+        ],
+        F: [
+          [0, 40],
+          [0, 0],
+          [40, 0],
+        ],
+        G: [
+          [40, 0],
+          [0, 0],
+          [0, 40],
+          [40, 40],
+          [40, 20],
+          [20, 20],
+        ],
+        H: [
+          [0, 40],
+          [0, 20],
+          [40, 20],
+          [40, 40],
+        ],
+        I: [
+          [20, 0],
+          [20, 40],
+        ],
+        J: [
+          [0, 20],
+          [0, 40],
+          [40, 40],
+          [40, 0],
+        ],
+        K: [
+          [0, 0],
+          [0, 20],
+          [20, 0],
+        //   [20, 0],
+        ],
+        L: [
+          [0, 0],
+          [0, 40],
+          [40, 40],
+        ],
+        M: [
+          [0, 40],
+          [0, 0],
+          [40, 0],
+          [40, 40],
+        ],
+        N: [
+          [0, 40],
+          [0, 0],
+          [20, 0],
+          [20, 40],
+          [40, 40],
+          [40, 0],
+        ],
+        O: [
+            [40, 40],
+            [0,40],
+            [0,0],
+            [40,0],
+            [40,40]
+        ],
+        P: [
+            [0,40],
+            [0,0],
+            [40,0],
+            [40,20],
+            [0,20]
+        ],
+        Q: [
+            [20, 40],
+            [0,40],
+            [0,0],
+            [40,0],
+            [40,20],
+            [20, 40]
+        ],
+        R: [
+            [0,40],
+            [0,0],
+            [20,0],
+            [20,20],
+            [40,20],
+            [40,40]
+        ],
+        S: [
+            [40,0],
+            [0,0],
+            [0,20],
+            [40,20],
+            [40,40],
+            [0,40]
+        ],
+        T: [
+            [0,0],
+            [40,0]
+        ],
+        U: [
+            [0,0],
+            [0,40],
+            [40,40],
+            [40,0]
+        ],
+        V: [
+            [0,0],
+            [0,20],
+            [20,40],
+            [40,20],
+            [40,0]
+        ],
+        W: [
+            [0,0],
+            [0,40],
+            [40,40],
+            [40,0]
+        ],
+        X: [
+            [0,0],
+            [40,40]
+        ],
+        Y: [
+            [0,0],
+            [0,20],
+            [40,20],
+            [40,0]
+        ],
+        Z: [
+            [0,0],
+            [40,0],
+            [0,40],
+            [40,40]
+        ],
+        " ": []
+      };
+      const fontContourData = {
+        A: [
+          [0, 20],
+          [40, 20],
+        ],
+        B: [
+          [0, 20],
+          [20, 20],
+        ],
+        E: [
+          [0, 20],
+          [40, 20],
+        ],
+        F: [
+          [0, 20],
+          [40, 20],
+        ],
+        H: [
+          [0, 0],
+          [0, 20],
+          [40, 20],
+          [40, 0],
+        ],
+        K: [
+          [0, 40],
+          [0, 20],
+          [40, 20],
+          [40, 40],
+        ],
+        M: [
+          [20, 0],
+          [20, 20],
+        ],
+        Q: [
+          [20, 20],
+          [40, 40],
+        ],
+        R: [
+          [0, 20],
+          [20, 20],
+        ],
+        T: [
+          [20, 0],
+          [20, 40],
+        ],
+        W: [
+          [20, 40],
+          [20, 20],
+        ],
+        X: [
+          [0, 40],
+          [40, 0],
+        ],
+        Y: [
+          [20, 20],
+          [20, 40],
+        ],
+      };
+
+      let x = 120;
+      const alpha = "THE QUICK BROWN FOX JUMPED LAZILY OVER THE FENCE";
+      const alphaArray = alpha.split("");
+      const fontProps = alphaArray.map((char, i) => {
+        const hue = i * 4;
+        const x = 20 + (i % 30) * 50;
+        const y = i < 30 ? 200 : 255;
+        const delay = i * 100;
+        return { char, hue, x, y, delay };
+      });
+
+      function getLetter(props) {
+        const { char, hue, x, y, delay, arr } = props;
+        const verts = arr[char].slice();
+        const totalVerts = verts.length - 1;
+        const curVerts = [verts.shift()];
+
+        if (char === " ") {
+            return { update: function () {/* noop*/}};
+        }
+        // initialize
+        let curIndex = 0;
+        let startPos = curVerts[curIndex];
+        let curPos = curVerts[curIndex];
+        let goalPos = curVerts[curIndex];
+        let amt = 0;
+        let amtInc = 0.05;
+        const rate = 0.002;
+
+        function calcAmtInc() {
+          let [startX, startY] = startPos;
+          let [goalX, goalY] = goalPos;
+          return (115 - max(abs(goalX - startX), abs(goalY - startY))) * rate;
+        }
+
+        function moveVertex() {
+          amt += amtInc;
+          let curAmt = min(amt, 1);
+          let [startX, startY] = startPos;
+          let [goalX, goalY] = goalPos;
+          return [lerp(startX, goalX, curAmt), lerp(startY, goalY, curAmt)];
+        }
+
+        function addVertex() {
+          curVerts.push(verts.shift());
+          startPos = curVerts[curIndex];
+          curPos = curVerts[curIndex];
+          curIndex += 1;
+          amt = 0;
+          goalPos = curVerts[curIndex];
+          amtInc = calcAmtInc();
+        }
+
+        function update() {
+          if (millis() > delay) {
+            curPos = moveVertex();
+            let [cx, cy] = curPos;
+            let [gx, gy] = goalPos;
+            if (abs(cx - gx) < 0.1 && abs(cy - gy) < 0.1) {
+              if (curIndex >= totalVerts) {
+                // nope;
+              } else {
+                addVertex();
+              }
+            }
+
+            push();
+            translate(x, y);
+            stroke(hue, 100, 250);
+            beginShape();
+            curVerts.forEach((p, i) => {
+              const [px, py] = i === curIndex ? curPos : p;
+              vertex(px, py);
+            });
+            endShape();
+            pop();
+          }
+        }
+        return {
+          update,
+        };
+      }
+
+      function getLetters() {
+        const letterObjects = [];
+        fontProps.forEach((l) => {
+          const { char } = l;
+          // add letters
+          letterObjects.push(getLetter({ ...l, arr: fontData }));
+          // add contours
+          if (fontContourData[char]) {
+            letterObjects.push(getLetter({ ...l, arr: fontContourData }));
+          }
+        });
+        return letterObjects;
+      }
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        stroke(0, 100, 100);
+        strokeWeight(4);
+        noFill();
+
+        letters = getLetters();
+      }
+
+      function draw() {
+        clear();
+        if (paused === false) {
+          scale(1.0);
+          letters.forEach((l) => l.update());
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,18 @@
+body {
+  margin: 10px;
+  padding: 0;
+  background-color: #202020;
+  background: url("assets/space.png");
+  animation: slowspin linear 25s infinite;
+}
+@keyframes slowspin {
+  0% {
+    background-position: 0;
+  }
+  50% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: 0;
+  }
+}

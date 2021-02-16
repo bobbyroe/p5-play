@@ -4,23 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>P5</title>
-    <style>
-      body {
-        margin: 10px;
-        padding: 0;
-        background-color: #202020;
-        background: url("assets/space.png");
-        animation: slowspin linear 25s infinite;
-      }
-      @keyframes slowspin {
-        0% {
-          background-position: 0;
-        }
-        100% {
-          background-position: 100%;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="basic-style.css" />
     <script src="libs/p5.min.js"></script>
     <script>
       let paused = false;
@@ -42,7 +26,7 @@
 
       function draw() {
         frameCount += 2;
-        
+
         if (paused === false) {
           clear();
 
@@ -53,10 +37,7 @@
               translate(
                 startPos.x + c * gap,
                 startPos.y + r * gap,
-                sin(
-                  n +
-                    frameCount * 0.05
-                ) * 100
+                sin(n + frameCount * 0.05) * 100
               );
               rotateY(radians(mouseX * 0.1));
               rotateX(radians(mouseY * 0.1));
@@ -65,8 +46,6 @@
               pop();
             }
           }
-
-          // camera(sin(millis() * 0.001) * 1000 + width * 0.5, height * 0.5, (height * 0.5) / tan(PI / 6), width * 0.5, height * 0.5, 0, 0, 1, 0)
         }
       }
 

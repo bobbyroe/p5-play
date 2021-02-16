@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin linear 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      let paper;
+      // Spirograph ring & wheel measurements
+      const rings = [105, 96];
+      const wheels = [
+        84,
+        80,
+        75,
+        72,
+        63,
+        60,
+        56,
+        52,
+        48,
+        45,
+        42,
+        40,
+        32,
+        30,
+        24,
+      ];
+      // https://www.wikihow.com/Find-the-Least-Common-Multiple-of-Two-Numbers
+      // Method 4: Euclid's Algorithm
+      
+      // The LCM (least common multiple) of
+      // (ring size) & (wheel size) =
+      // divide LCM by wheel size = number of points/pedals
+      // ex: LCM of 96 & 60 = 480
+      function getNumPedals(a, b, c, d) {
+        if (!c) { c = a; }
+        if (!d) { d = b; }
+        let dividend = Math.max(a, b);
+        let divisor = Math.min(a, b);
+        let quotient = Math.floor(dividend / divisor);
+        let remainder = dividend % divisor;
+        let numPedals = 0;
+        if (remainder === 0) {
+          numPedals = (c * d) / divisor / d;
+        } else {
+          numPedals = getNumPedals(divisor, remainder, c, d);
+        }
+        return numPedals;
+      }
+      
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+        // "2nd canvas"
+        paper = createGraphics(windowWidth - 20, windowHeight - 20);
+        paper.colorMode(HSB);
+        paper.noFill();
+        paper.strokeWeight(2);
+        paper.stroke(180, 100, 100);
+
+        colorMode(HSB);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+
+        // DEBUG
+        // let inc = 0;
+        // rings.forEach((r, n) => {
+        //   wheels.forEach((w, nn) => {
+        //     let numPoints = getRatio(r, w);
+        //     console.log(`${inc})`, r, w, numPoints);
+        //   });
+        // });
+      }
+      const scaleFactor = 5;
+      const ringRadius = 96 * scaleFactor;
+      const wheelRadius = 52 * scaleFactor;
+      const radius = ringRadius - wheelRadius;
+      const fraction = 0.9; // 'fraction' corresponds to the 'hole' on the wheel;
+      // const ratio = getRatio(96, 52); // number of points - 1; <<<<
+      const ratio = ringRadius / wheelRadius - 1;
+      const rate = (1 / ratio) * 0.1; // affects curve fidelity & speed of drawing
+      let prevPen;
+      let counter = 1;
+
+      function draw() {
+        let x = mid.x;
+        let y = mid.y;
+        let pen = {
+          x:
+            x +
+            radius * cos(counter) +
+            fraction * wheelRadius * cos(counter * ratio),
+          y:
+            y +
+            radius * sin(counter) -
+            fraction * wheelRadius * sin(counter * ratio),
+        };
+        if (prevPen === undefined) {
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+        if (paused === false) {
+          clear();
+          counter += rate;
+          paper.stroke(counter * 2, 100, 100);
+          paper.strokeWeight(1);
+        
+          paper.line(prevPen.x, prevPen.y, pen.x, pen.y);
+          image(paper, 0, 0);
+
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
