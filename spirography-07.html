@@ -10,6 +10,7 @@
       let paused = false;
       let mid = { x: 0, y: 0 };
       let paper;
+      let guidePaper;
 
       function getNumLoops(a, b, c, d) {
         if (!c) {
@@ -31,55 +32,72 @@
         return numLoops;
       }
 
-      function drawSpirograph (opts) {
-        // clear();
-        let { ringCircumference, wheelCircumference, fraction } = opts;
+      function drawSpirograph(opts) {
+        guidePaper.clear();
+        const scaleFactor = 5;
+        let {
+          ringCircumference,
+          wheelCircumference,
+          fraction,
+          rotation,
+        } = opts;
+        ringCircumference *= scaleFactor;
+        wheelCircumference *= scaleFactor;
         let x = mid.x;
         let y = mid.y;
-        let radius = ringCircumference - wheelCircumference;
+        const radius = ringCircumference - wheelCircumference;
+
         let ratio = ringCircumference / wheelCircumference - 1;
-        let rate = (1 / ratio) * 0.1; // speed of drawing & curve fidelity
+        let rate = (1 / ratio) * 0.02; // speed of drawing & curve fidelity
         let pen;
         let prevPen;
         let counter = 0;
         const numLoops = getNumLoops(ringCircumference, wheelCircumference);
-        const counterMax = Math.PI * 2 * numLoops / (ratio + 1);
-
+        const counterMax = (Math.PI * 2 * numLoops) / (ratio + 1.0) + 0.2;
+        
+        guidePaper.push();
+        guidePaper.translate(x, y);
+        guidePaper.rotate(rotation);
+        guidePaper.translate(-x, -y);
         while (counter < counterMax) {
-        pen = {
-          x:
-            x +
-            radius * cos(counter) +
-            fraction * wheelCircumference * cos(counter * ratio),
-          y:
-            y +
-            radius * sin(counter) -
-            fraction * wheelCircumference * sin(counter * ratio),
-        };
-        if (prevPen === undefined) {
+          pen = {
+            x:
+              x +
+              radius * cos(counter) +
+              fraction * wheelCircumference * cos(counter * ratio),
+            y:
+              y +
+              radius * sin(counter) -
+              fraction * wheelCircumference * sin(counter * ratio),
+          };
+          if (prevPen === undefined) {
+            prevPen = {
+              x: pen.x,
+              y: pen.y,
+            };
+          }
+          counter += rate;
+          guidePaper.stroke(pen.x * 0.2, 100, 100);
+          guidePaper.strokeWeight(1);
+          guidePaper.line(prevPen.x, prevPen.y, pen.x, pen.y);
+
           prevPen = {
             x: pen.x,
             y: pen.y,
           };
         }
-        counter += rate;
-        stroke(pen.x * 0.2, 100, 100);
-        strokeWeight(1);
-        line(prevPen.x, prevPen.y, pen.x, pen.y);
+        guidePaper.pop();
+      }
 
-        prevPen = {
-          x: pen.x,
-          y: pen.y,
-        };
+      function saveToPaper() {
+        paper.image(guidePaper, 0, 0);
       }
-      }
-      
-      const scaleFactor = 5;
       const options = {
-        ringCircumference: 96 * scaleFactor,
-        wheelCircumference: 56 * scaleFactor,
-        fraction: 1, // 'fraction' corresponds to the 'hole' on the wheel,
-      }
+        ringCircumference: 96,
+        wheelCircumference: 84,
+        fraction: 0.78, // 'fraction' corresponds to the 'hole' on the wheel, between 0.78 - 0.15
+        rotation: 0,
+      };
 
       function setup() {
         createCanvas(windowWidth - 20, windowHeight - 20);
@@ -87,21 +105,57 @@
           x: windowWidth * 0.5,
           y: windowHeight * 0.5,
         };
-        colorMode(HSB);
-        noFill();
-        stroke(0, 0, 100);
-        strokeWeight(0.5);
+
+        // "2nd canvas"
+        paper = createGraphics(windowWidth - 20, windowHeight - 20);
+
+        // "3rd" canvas"
+        guidePaper = createGraphics(windowWidth - 20, windowHeight - 20);
+        guidePaper.colorMode(HSB);
+        guidePaper.noFill();
+        guidePaper.stroke(0, 0, 100);
+        guidePaper.strokeWeight(0.5);
         drawSpirograph(options);
       }
       function draw() {
+        clear();
         if (paused === false) {
-          // options.fraction = cos(millis() * 0.0001);
-          // drawSpirograph(options);
+          image(guidePaper, 0, 0);
+          image(paper, 0, 0);
         }
       }
+      const ringCircumferences = [96, 105];
+      const wheelCircumference = [
+        84,
+        80,
+        75,
+        72,
+        63,
+        60,
+        56,
+        52,
+        48,
+        45,
+        42,
+        40,
+        32,
+        30,
+        24,
+      ];
+      let ringIndex = 0;
+      let wheelIndex = 0;
       function keyPressed() {
         const leftBracket = 219;
         const rightBracket = 221;
+        const leftArrow = 37;
+        const upArrow = 38;
+        const rightArrow = 39;
+        const downArrow = 40;
+        const R = 82;
+        const S = 83;
+        const SPACE = 32;
+
+        console.log(options);
         if (keyCode === ESCAPE) {
           paused = !paused;
         }
@@ -112,6 +166,51 @@
         if (keyCode === rightBracket) {
           options.fraction += 0.02;
           drawSpirograph(options);
+        }
+        if (keyCode === leftArrow) {
+          wheelIndex -= 1;
+          if (wheelIndex < 0) {
+            wheelIndex = wheelCircumference.length - 1;
+          }
+          options.wheelCircumference = wheelCircumference[wheelIndex];
+          drawSpirograph(options);
+        }
+        if (keyCode === rightArrow) {
+          wheelIndex += 1;
+          if (wheelIndex > wheelCircumference.length - 1) {
+            wheelIndex = 0;
+          }
+          options.wheelCircumference = wheelCircumference[wheelIndex];
+          drawSpirograph(options);
+        }
+
+        if (keyCode === upArrow) {
+          ringIndex -= 1;
+          if (ringIndex < 0) {
+            ringIndex = ringCircumferences.length - 1;
+          }
+          options.ringCircumference = ringCircumferences[ringIndex];
+          drawSpirograph(options);
+        }
+        if (keyCode === downArrow) {
+          ringIndex += 1;
+          if (ringIndex > ringCircumferences.length - 1) {
+            ringIndex = 0;
+          }
+          options.ringCircumference = ringCircumferences[ringIndex];
+          drawSpirograph(options);
+        }
+
+        if (keyCode === S) {
+          saveToPaper();
+        }
+        if (keyCode === R) {
+          options.rotation += 0.05;
+          drawSpirograph(options);
+        }
+        if (keyCode === SPACE) {
+          // save image of canvas
+          saveCanvas("Spirography-07", "png");
         }
         return false;
       }

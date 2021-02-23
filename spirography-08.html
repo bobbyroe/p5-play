@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <link rel="stylesheet" href="basic-style.css" />
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      let paper;
+      let guidePaper;
+
+      function getNumLoops(a, b, c, d) {
+        if (!c) {
+          c = a;
+        }
+        if (!d) {
+          d = b;
+        }
+        let dividend = Math.max(a, b);
+        let divisor = Math.min(a, b);
+        let quotient = Math.floor(dividend / divisor);
+        let remainder = dividend % divisor;
+        let numLoops = 0;
+        if (remainder === 0) {
+          numLoops = (c * d) / divisor / d;
+        } else {
+          numLoops = getNumLoops(divisor, remainder, c, d);
+        }
+        return numLoops;
+      }
+
+      function drawSpirograph(opts) {
+        guidePaper.clear();
+        const scaleFactor = 5;
+        let {
+          ringCircumference,
+          wheelCircumference,
+          fraction,
+          rotation,
+          hue,
+        } = opts;
+        ringCircumference *= scaleFactor;
+        wheelCircumference *= scaleFactor;
+        let x = mid.x;
+        let y = mid.y;
+        const radius = ringCircumference - wheelCircumference;
+
+        let ratio = ringCircumference / wheelCircumference - 1;
+        let rate = (1 / ratio) * 0.02; // speed of drawing & curve fidelity
+        let pen;
+        let prevPen;
+        let counter = 0;
+        const numLoops = getNumLoops(ringCircumference, wheelCircumference);
+        const counterMax = (Math.PI * 2 * numLoops) / (ratio + 1.0) + 0.2;
+
+        guidePaper.push();
+        guidePaper.translate(x, y);
+        guidePaper.rotate(radians(rotation));
+        guidePaper.translate(-x, -y);
+        while (counter < counterMax) {
+          pen = {
+            x:
+              x +
+              radius * cos(counter) +
+              fraction * wheelCircumference * cos(counter * ratio),
+            y:
+              y +
+              radius * sin(counter) -
+              fraction * wheelCircumference * sin(counter * ratio),
+          };
+          if (prevPen === undefined) {
+            prevPen = {
+              x: pen.x,
+              y: pen.y,
+            };
+          }
+          counter += rate;
+          guidePaper.stroke(hue, 100, 100); //
+          guidePaper.strokeWeight(1);
+          guidePaper.line(prevPen.x, prevPen.y, pen.x, pen.y);
+
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+        guidePaper.pop();
+      }
+
+      function saveToPaper() {
+        paper.image(guidePaper, 0, 0);
+      }
+      const options = {
+        ringCircumference: 96,
+        wheelCircumference: 84,
+        fraction: 0.78, // 'fraction' corresponds to the 'hole' on the wheel, between 0.78 - 0.15
+        rotation: 0,
+        hue: 0,
+      };
+
+      // https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types#color_picker_control
+      function setupSliderControl(props) {
+        const { id, outId, attr } = props;
+        const slider = document.querySelector(id);
+        const output = document.querySelector(outId);
+        slider.addEventListener("input", (evt) => {
+          const { target } = evt;
+          const { value } = target;
+          output.textContent = value;
+          options[attr] = +value;
+          drawSpirograph(options);
+        });
+      }
+
+      function setupRadioControls () {
+
+        const footer = document.querySelector('footer');
+        footer.addEventListener('change', (evt) => {
+          const { target } = evt;
+          const {name, id, value } = target;
+          console.log(name, id, value);
+          if (name === "ring-circ") {
+            options.ringCircumference = +value;
+            drawSpirograph(options);
+          }
+          if (name === "wheel-circ") {
+            options.wheelCircumference = +value;
+            drawSpirograph(options);
+          }
+        });
+
+      }
+      /*
+       *
+       * SETUP
+       *
+       */
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+
+        // "2nd canvas"
+        paper = createGraphics(windowWidth - 20, windowHeight - 20);
+
+        // "3rd" canvas"
+        guidePaper = createGraphics(windowWidth - 20, windowHeight - 20);
+        guidePaper.colorMode(HSB);
+        guidePaper.noFill();
+        guidePaper.stroke(0, 0, 100);
+        guidePaper.strokeWeight(0.5);
+        drawSpirograph(options);
+        setupSliderControl({ id: "#rotation", outId: "#rotation-output", attr: "rotation", });
+        setupSliderControl({ id: "#hue", outId: "#hue-output", attr: "hue" });
+        setupSliderControl({ id: "#fraction", outId: "#fraction-output", attr: "fraction" });
+        setupRadioControls();
+      }
+
+      /*
+       *
+       * DRAW
+       *
+       */
+      function draw() {
+        clear();
+        if (paused === false) {
+          image(guidePaper, 0, 0);
+          image(paper, 0, 0);
+        }
+      }
+      const ringCircumferences = [96, 105];
+      const wheelCircumference = [
+        84,
+        80,
+        75,
+        72,
+        63,
+        60,
+        56,
+        52,
+        48,
+        45,
+        42,
+        40,
+        32,
+        30,
+        24,
+      ];
+      let ringIndex = 0;
+      let wheelIndex = 0;
+      function keyPressed() {
+        const leftBracket = 219;
+        const rightBracket = 221;
+        const leftArrow = 37;
+        const upArrow = 38;
+        const rightArrow = 39;
+        const downArrow = 40;
+        const R = 82;
+        const S = 83;
+        const SPACE = 32;
+
+        console.log(options);
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        if (keyCode === leftBracket) {
+          options.fraction -= 0.02;
+          drawSpirograph(options);
+        }
+        if (keyCode === rightBracket) {
+          options.fraction += 0.02;
+          drawSpirograph(options);
+        }
+        // if (keyCode === leftArrow) {
+        //   wheelIndex -= 1;
+        //   if (wheelIndex < 0) {
+        //     wheelIndex = wheelCircumference.length - 1;
+        //   }
+        //   options.wheelCircumference = wheelCircumference[wheelIndex];
+        //   drawSpirograph(options);
+        // }
+        // if (keyCode === rightArrow) {
+        //   wheelIndex += 1;
+        //   if (wheelIndex > wheelCircumference.length - 1) {
+        //     wheelIndex = 0;
+        //   }
+        //   options.wheelCircumference = wheelCircumference[wheelIndex];
+        //   drawSpirograph(options);
+        // }
+
+        // if (keyCode === upArrow) {
+        //   ringIndex -= 1;
+        //   if (ringIndex < 0) {
+        //     ringIndex = ringCircumferences.length - 1;
+        //   }
+        //   options.ringCircumference = ringCircumferences[ringIndex];
+        //   drawSpirograph(options);
+        // }
+        // if (keyCode === downArrow) {
+        //   ringIndex += 1;
+        //   if (ringIndex > ringCircumferences.length - 1) {
+        //     ringIndex = 0;
+        //   }
+        //   options.ringCircumference = ringCircumferences[ringIndex];
+        //   drawSpirograph(options);
+        // }
+
+        if (keyCode === S) {
+          saveToPaper();
+        }
+        if (keyCode === R) {
+          options.rotation += 0.05;
+          drawSpirograph(options);
+        }
+        if (keyCode === SPACE) {
+          // save image of canvas
+          saveCanvas("Spirography-xxxx", "png");
+        }
+        // return false;
+      }
+    </script>
+  </head>
+  <body>
+    <footer>
+      <ul>
+        <li class="radio-buttons">
+          <p>Ring circumference:</p>
+          <input type="radio" name="ring-circ" id="ring-105" value="105" />
+          <label for="ring-105">105</label>
+          <input type="radio" name="ring-circ" id="ring-96" value="96" checked/>
+          <label for="ring-96">96</label>
+        </li>
+
+        <li class="radio-buttons">
+          <p>Wheel circumference:</p>
+          <input type="radio" name="wheel-circ" id="wheel-84" value="84" checked/>
+          <label for="wheel-84">84</label>
+          <input type="radio" name="wheel-circ" id="wheel-80" value="80" />
+          <label for="wheel-80">80</label>
+          <input type="radio" name="wheel-circ" id="wheel-75" value="75" />
+          <label for="wheel-75">75</label>
+          <input type="radio" name="wheel-circ" id="wheel-72" value="72" />
+          <label for="wheel-72">72</label>
+          <input type="radio" name="wheel-circ" id="wheel-63" value="63" />
+          <label for="wheel-63">63</label>
+          <input type="radio" name="wheel-circ" id="wheel-60" value="60" />
+          <label for="wheel-60">60</label>
+          <input type="radio" name="wheel-circ" id="wheel-56" value="56" />
+          <label for="wheel-56">56</label>
+          <input type="radio" name="wheel-circ" id="wheel-52" value="52" />
+          <label for="wheel-52">52</label>
+          <input type="radio" name="wheel-circ" id="wheel-48" value="48" />
+          <label for="wheel-48">48</label>
+          <input type="radio" name="wheel-circ" id="wheel-45" value="45" />
+          <label for="wheel-45">45</label>
+          <input type="radio" name="wheel-circ" id="wheel-42" value="42" />
+          <label for="wheel-42">42</label>
+          <input type="radio" name="wheel-circ" id="wheel-40" value="40" />
+          <label for="wheel-40">40</label>
+          <input type="radio" name="wheel-circ" id="wheel-32" value="32" />
+          <label for="wheel-32">32</label>
+          <input type="radio" name="wheel-circ" id="wheel-30" value="30" />
+          <label for="wheel-30">30</label>
+          <input type="radio" name="wheel-circ" id="wheel-24" value="24" />
+          <label for="wheel-24">24</label>
+        </li>
+        <li class="sliders">
+          <label for="rotation">Rotation: </label>
+          <input
+            type="range"
+            name="rotation"
+            id="rotation"
+            min="0"
+            max="360"
+            step="1"
+            value="0"
+          />
+          <output for="rotation" id="rotation-output">0</output>
+        </li>
+        <li class="sliders">
+          <label for="hue">Hue: </label>
+          <input
+            type="range"
+            name="hue"
+            id="hue"
+            min="0"
+            max="360"
+            step="1"
+            value="0"
+          />
+          <output for="hue" id="hue-output">0</output>
+        </li>
+        <li class="sliders">
+          <label for="fraction">fraction: </label>
+          <input
+            type="range"
+            name="fraction"
+            id="fraction"
+            min="0.15"
+            max="0.80"
+            step="0.01"
+            value="0.80"
+          />
+          <output for="fraction" id="fraction-output">0.80</output>
+        </li>
+      </ul>
+    </footer>
+  </body>
+</html>
