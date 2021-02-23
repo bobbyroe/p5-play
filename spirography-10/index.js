@@ -87,23 +87,7 @@ function saveToPaper() {
   paper.image(guidePaper, 0, 0);
 }
 const ringCircumferences = [96, 105];
-const wheelCircumferences = [
-  84,
-  80,
-  75,
-  72,
-  63,
-  60,
-  56,
-  52,
-  48,
-  45,
-  42,
-  40,
-  32,
-  30,
-  24,
-];
+const wheelCircumferences = [84, 80, 75, 72, 63, 60, 56, 52, 48, 45, 42, 40, 32, 30, 24];
 let ringIndex = 0;
 let wheelIndex = 0;
 let options = {
@@ -134,7 +118,6 @@ function setupRadioControls() {
   footer.addEventListener("change", (evt) => {
     const { target } = evt;
     const { name, id, value } = target;
-    console.log(name, id, value);
     if (name === "ring-circ") {
       options.ringCircumference = +value;
       drawSpirograph(options);
@@ -212,7 +195,7 @@ function toggleControls() {
   mid.y = showControls ? windowHeight * 0.38 : windowHeight * 0.5;
   drawSpirograph(options);
 }
-function randomizeOptions() {
+function randomizeMe() {
   options = {
     ringCircumference: random(ringCircumferences),
     wheelCircumference: random(wheelCircumferences),
@@ -225,11 +208,25 @@ function randomizeOptions() {
   drawSpirograph(options);
   // also update controls
 }
+function pattern1() {
+  const numSteps = 12;
+  let n = 0;
+  while (n < numSteps) {
+    options.fraction -= 0.02;
+    options.rotation += 2;
+    options.hue += 4;
+    drawSpirograph(options);
+    saveToPaper();
+    n += 1;
+  }
+}
+
 function keyPressed() {
   const S = 83;
   const SPACE = 32;
   const tilde = 192;
   const R = 82;
+  const key1 = 49;
   console.log(keyCode);
   if (keyCode === ESCAPE) {
     paused = !paused;
@@ -244,6 +241,9 @@ function keyPressed() {
     toggleControls();
   }
   if (keyCode === R) {
-    randomizeOptions();
+    randomizeMe();
+  }
+  if (keyCode === key1) {
+    pattern1();
   }
 }
