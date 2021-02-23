@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let middle;
+      let paused = false;
+      const shapes = [];
+      const numShapes = 500;
+      const radius = 450;
+
+      function getShape(n) {
+        let x,
+          y,
+          goalX,
+          goalY,
+          scale,
+          goalScale,
+          time,
+          hue,
+          angle,
+          randomRadius;
+        x = middle.x;
+        y = middle.y;
+        angle = random(TWO_PI);
+        randomRadius = radius * sqrt(random());
+        goalX = cos(angle) * randomRadius + middle.x;
+        goalY = sin(angle) * randomRadius + middle.y;
+        rote = random(TWO_PI);
+        goalRote = rote;
+        scale = random(2, 8);
+        goalScale = scale;
+        hue = random(60, 150);
+        const delay = random(300, 600);
+        time = delay;
+        const speed = 0.1;
+        function update() {
+          time -= 1;
+          if (time < 0) {
+            angle = random(TWO_PI);
+            randomRadius = radius * sqrt(random());
+            goalX = cos(angle) * randomRadius + middle.x;
+            goalY = sin(angle) * randomRadius + middle.y;
+            goalScale = random(2, 8);
+            time = delay;
+          }
+          x -= (x - goalX) * speed;
+          y -= (y - goalY) * speed;
+          rote -= (rote - goalRote) * speed;
+          scale -= (scale - goalScale) * speed;
+          stroke(hue, 200, 50);
+          strokeWeight(round(scale));
+          point(x, y);
+        }
+        return { x, y, goalX, goalY, rote, scale, goalScale, delay, update, n };
+      }
+      function setup() {
+        // initialize
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        colorMode(HSB);
+        for (let i = 0; i < numShapes; i++) {
+          shape = getShape(i);
+          shapes.push(shape);
+        }
+
+        createCanvas(windowWidth - 20, windowHeight - 20);
+      }
+      // continuous loop
+
+      function draw() {
+        if (paused === false) {
+          if (millis() % 2000 === 0) {
+            background("rgba(0, 0, 0, 0.08)");
+          }
+          shapes.forEach((s) => s.update());
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

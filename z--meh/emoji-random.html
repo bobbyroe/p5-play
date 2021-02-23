@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let middle;
+      let paused = false;
+      const shapes = [];
+      const emojis = [
+        "🔥",
+        "🍐",
+        "🍆",
+        "🦪",
+        "✨",
+        "🥳",
+        "🎹",
+        "😂",
+        "📦",
+        "🎅🏼",
+      ];
+      const numShapes = 50;
+      const boundsSize = 300;
+
+      function getShape(n) {
+        let x, y, goalX, goalY, rote, goalRote, scale, goalScale, time;
+        const emoji = random(emojis);
+        x = middle.x;
+        y = middle.y;
+        goalX = random(-boundsSize, boundsSize) + middle.x;
+        goalY = random(-boundsSize, boundsSize) + middle.y;
+        rote = random(TWO_PI);
+        goalRote = rote;
+        scale = random(48, 128);
+        goalScale = scale;
+        const delay = random(256, 512);
+        time = delay;
+        const speed = 0.1;
+        function update () {
+          time -= 1;
+          if (time < 0) {
+            goalX = random(-boundsSize, boundsSize) + middle.x;
+            goalY = random(-boundsSize, boundsSize) + middle.y;
+            goalRote = random(TWO_PI);
+            goalScale = random(48, 128);
+            time = delay;
+          }          
+
+          x -= (x - goalX) * speed;
+          y -= (y - goalY) * speed;
+          rote -= (rote - goalRote) * speed;
+          scale -= (scale - goalScale) * speed;
+          resetMatrix();
+          translate(x, y);
+          push();
+          textSize(round(scale));
+          rotate(rote);
+          text(emoji, 0, 0);
+          pop();
+        }
+        return { x, y, goalX, goalY, rote, scale, goalScale, delay, update, emoji, n };
+      }
+      function setup() {
+        // initialize
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+
+        // stoke
+
+        for (let i = 0; i < numShapes; i++) {
+          shape = getShape(i);
+          shapes.push(shape);
+        }
+
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        textSize(72);
+        // fill(255, 255, 255);
+        textAlign(CENTER, CENTER);
+      }
+      // continuous loop
+
+      function draw() {
+        if (paused === false) {
+          // background("rgba(0, 0, 0, 0.005)");
+          shapes.forEach((s) => s.update() );
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin linear 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let mid;
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        colorMode(HSB);
+        noStroke();
+        fill(0, 100, 100);
+      }
+
+      let paused = false;
+      let x = 0;
+      let y = 0;
+      let radius = 550;
+      let radiusInc = 6;
+      let incMult = 0.001;
+      function draw() {
+        let inc = millis() * incMult;
+        incMult += 0.000005;
+        if (paused === false) {
+          fill(radius * 0.2, 100, 100);
+          x = cos(inc) * radius + mid.x;
+          y = sin(inc) * radius + mid.y;
+          ellipse(x, y, 10);
+
+          radiusInc = max(radiusInc - 0.08, 1);
+          radius -= radiusInc;
+          if (radius < 0) {
+            paused = true;
+          }
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

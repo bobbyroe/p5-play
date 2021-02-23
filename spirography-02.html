@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin linear 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      let paper;
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+        // "2nd canvas"
+        paper = createGraphics(windowWidth - 20, windowHeight - 20);
+        paper.colorMode(HSB);
+        paper.noFill();
+        paper.strokeWeight(2);
+        paper.stroke(180, 100, 100);
+
+        colorMode(HSB);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+      }
+
+      const ringRadius = 300;
+      const wheelRadius = 100;
+      const radius = ringRadius - wheelRadius;
+      const fraction = 0.5;
+      const ratio = 10;
+      const rate = 0.02;
+      let prevPen;
+      let counter = 0;
+
+      function draw() {
+        let x = mid.x;
+        let y = mid.y;
+        let pen = {
+          x: x + radius * cos(counter) + fraction * wheelRadius * cos(counter * ratio),
+          y: y + radius * sin(counter) - fraction * wheelRadius * sin(counter * ratio),
+        };
+        if (prevPen === undefined) {
+          prevPen = {
+            x: x + cos(counter) * (ringRadius - wheelRadius * 0.5),
+            y: y + sin(counter) * (ringRadius - wheelRadius * 0.5),
+          };
+        }
+        if (paused === false) {
+          clear();
+          counter += rate;
+
+          paper.stroke(counter, 100, 100);
+          paper.strokeWeight(2);
+          paper.line(prevPen.x, prevPen.y, pen.x, pen.y);
+          
+          image(paper, 0, 0);
+
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

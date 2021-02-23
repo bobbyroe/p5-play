@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin linear 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+        colorMode(HSB);
+        // angleMode(DEGREES);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+      }
+
+      const ringRadius = 300;
+      const wheelRadius = 100;
+      let counter = 0;
+      function draw() {
+        let x = mid.x;
+        let y = mid.y;
+        if (paused === false) {
+            clear();
+          counter += 0.02;
+          stroke(0, 0, 100);
+          strokeWeight(0.5);
+          circle(mid.x, mid.y, ringRadius * 2 + 10);
+          // inner circle
+          push();
+          stroke(0, 100, wheelRadius);
+          strokeWeight(1);
+          translate(x + cos(counter) * (ringRadius - wheelRadius * 0.5), y + sin(counter) * (ringRadius - wheelRadius * 0.5));
+          rotate(-PI * counter);
+          circle(0, 0, 100);
+          line(0, 0, 50, 0);
+          pop();
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

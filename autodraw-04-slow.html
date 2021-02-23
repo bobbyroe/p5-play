@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        /* background: url("assets/space.png");
+        animation: slowspin 25s infinite; */
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let middle = { x: 0, y: 0 };
+      let center = { x: 0, y: 0 };
+      let goalCenter = { x: 0, y: 0 };
+      let delta = { x: 0, y: 0 };
+      let goal = { x: 0, y: 0 };
+      let pos = { x: 0, y: 0 };
+      let angle = 0;
+      let direction = 1;
+      let shipAngle;
+      let randomDist;
+      let speed = 0.5;
+      let hue = 0;
+      let goalHue = 0;
+      let weight = 2;
+      let goalWeight = 2;
+      let isPainting = true;
+      let randomRadius = 2;
+      let drawingSurface;
+      //
+      let c1x = 0;
+      let c1y = 0;
+      let c2x = 0;
+      let c2y = 0;
+
+      function initDrawingSurface () {
+        const drawSurf = createGraphics(windowWidth - 20, windowHeight - 20);
+        drawSurf.strokeWeight(weight);
+        drawSurf.colorMode(HSB);
+        drawSurf.stroke(hue, 0, 255);
+        drawSurf.noFill();
+        drawSurf.clear();
+        return drawSurf;
+      };
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        strokeWeight(2.0);
+        stroke(100, 100, 255);
+        colorMode(HSB);
+
+        drawingSurface = initDrawingSurface();
+
+        hue = random(80) + 200;
+        center = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        shipAngle = random(TWO_PI);
+        randomDist = random(100, 300);
+        pos = {
+          x: center.x + cos(shipAngle) * randomDist,
+          y: center.y + sin(shipAngle) * randomDist,
+        };
+      }
+
+      function drawShip(x, y, angle) {
+        strokeWeight(2.0);
+        push();
+        translate(x, y);
+        rotate(angle);
+        line(10, -15, 0, 15); // /
+        line(0, 15, -10, -15); // \
+        line(10, -15, 0, -9); // /
+        line(0, -9, -10, -15); // \
+        pop();
+      }
+
+      function draw() {
+        let { x, y } = pos;
+        
+        if (paused === false) {
+          if (random() < 0.03) {
+            direction = random() < 0.5 ? -1 : 1;
+            speed = random(0.05, 0.2);
+            randomDist = random(10, 300);
+            goalHue = random(360);
+            goalWeight = random(2) + 0.5;
+          }
+          if (random() < 0.03) {
+            goalCenter = {
+              x: random() * (windowWidth - 200) + 100,
+              y: random() * (windowHeight - 200) + 100,
+            };
+          }
+          
+          shipAngle += direction * speed;
+          center.x -= (center.x - goalCenter.x) * 0.3;
+          center.y -= (center.y - goalCenter.y) * 0.3;
+          hue -= (hue - goalHue) * 0.03;
+          weight -= (weight - goalWeight) * 0.03;
+          goal = {
+            x: center.x + cos(shipAngle) * randomDist,
+            y: center.y + sin(shipAngle) * randomDist,
+          };
+          delta = {
+            x: goal.x - pos.x,
+            y: goal.y - pos.y,
+          };
+          angle = atan2(-delta.x, delta.y);
+          pos.x -= (pos.x - goal.x) * speed;
+          pos.y -= (pos.y - goal.y) * speed;
+          // MIDPOINT
+          c2x = (x + pos.x) * 0.5 + random(-30, 30);
+          c2y = (y + pos.y) * 0.5 + random(-30, 30);
+          clear();
+          if (isPainting) {
+            drawingSurface.stroke(hue, 255, 255);
+          } else {
+            drawingSurface.noStroke();
+          }
+          drawingSurface.strokeWeight(weight);
+          drawingSurface.noFill();
+          drawingSurface.bezier(x, y, c2x, c2y, c2x, c2y, pos.x, pos.y);
+          // splatter
+          if (random() < 0.01) {
+            drawingSurface.fill(hue, 255, 255);
+            drawingSurface.ellipse(pos.x, pos.y, randomRadius);
+          }
+          image(drawingSurface, 0, 0);
+          // ship
+          drawShip(pos.x, pos.y, angle);
+        }
+      }
+
+      function keyPressed() {
+        const SPACE = 32;
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        if (keyCode === SPACE) {
+          // save image of canvas
+          saveCanvas("autoDrawing-03-fast", "png");
+          // filters
+          // drawingSurface.filter(BLUR, 2);
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

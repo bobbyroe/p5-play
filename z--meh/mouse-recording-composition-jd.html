@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s linear infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let positions = [];
+      let oldX, oldY;
+      let anchors = [];
+
+      function setup() {
+        noStroke();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        strokeWeight(5);
+      }
+
+      function drawEllipseAt(pos, level) {
+        const { x, y, sizes, hues, vals } = pos;
+        noStroke();
+        fill(hues[level], 255, vals[level]);
+        ellipse(x, y, sizes[level], sizes[level]);
+      }
+      function drawBezierAt(pos, level) {
+        const {
+          x,
+          y,
+          ox,
+          oy,
+          anchorPoints,
+          endAnchors,
+          hues,
+          vals,
+          strokeWeights,
+        } = pos;
+        const { x: ax, y: ay } = anchorPoints[level];
+        const { x: endAnchorX, y: endAnchorY } = endAnchors[level];
+        stroke(hues[level], 255, 0, 0.1); // vals[level]);
+        strokeWeight(strokeWeights[level]);
+        noFill();
+        bezier(ox, oy, ax, ay, endAnchorX, endAnchorY, x, y);
+      }
+
+      function getRandomPointNear(x, y) {
+        return { x: x + random(-50, 50), y: y + random(-50, 50) };
+      }
+      function getAnchors(x, y, endAnchors) {
+        return endAnchors.map((a) => {
+          return { x: x - (a.x - x), y: y - (a.y - y) };
+        });
+      }
+      // continuous loop
+      function draw() {
+        const levels = [0, 1, 2, 3];
+        const x = mouseX;
+        const y = mouseY;
+        const endAnchors = [
+          getRandomPointNear(x, y),
+          getRandomPointNear(x, y),
+          getRandomPointNear(x, y),
+          getRandomPointNear(x, y),
+        ];
+
+        if (keyIsDown(32)) {
+          positions.push({
+            x,
+            y,
+            ox: oldX,
+            oy: oldY,
+            anchorPoints: anchors,
+            endAnchors,
+            sizes: [
+              random(150, 400),
+              random(75, 200),
+              random(75, 150),
+              random(20, 75),
+            ],
+            rotes: [
+              random(TWO_PI),
+              random(TWO_PI),
+              random(TWO_PI),
+              random(TWO_PI),
+            ],
+            strokeWeights: [
+              random(0.5, 5),
+              random(0.5, 5),
+              random(0.5, 5),
+              random(0.5, 5),
+            ],
+            hues: [280, 280, 240, 190],
+            vals: [30, 120, 255, 255],
+          });
+          background("rgba(0, 0, 0, 0.01)");
+          levels.forEach((e, i) => {
+            positions.forEach((pos) => {
+              drawEllipseAt(pos, i);
+            });
+          });
+          levels.forEach((e, i) => {
+            positions.forEach((pos) => {
+              drawBezierAt(pos, i);
+            });
+          });
+        }
+        oldX = x;
+        oldY = y;
+        anchors = getAnchors(x, y, endAnchors);
+      }
+
+      function keyPressed() {
+        if (keyCode === 88) {
+          // x
+        }
+        if (keyCode === 68) {
+          // d (as in DRAW)
+        }
+      }
+      function keyReleased() {
+        if (keyCode === 32) {
+          positions = [];
+        }
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

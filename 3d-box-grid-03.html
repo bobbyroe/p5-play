@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <link rel="stylesheet" href="basic-style.css" />
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let frameCount = 0;
+      let startPos = {};
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20, WEBGL);
+        startPos = {
+          x: width * -0.35,
+          y: width * -0.35,
+        };
+        colorMode(HSB);
+      }
+
+      const numRows = 12;
+      const numCols = 12;
+      let n = 0;
+      const gap = 80;
+
+      function draw() {
+        frameCount += 2;
+
+        if (paused === false) {
+          clear();
+
+          for (let r = 0; r < numRows; r += 1) {
+            for (let c = 0; c < numCols; c += 1) {
+              n = abs(numRows * 0.5 - r) * 5 + abs(numCols * 0.5 - c) * 5;
+              push();
+              translate(
+                startPos.x + c * gap,
+                startPos.y + r * gap,
+                sin(n + frameCount * 0.05) * 100
+              );
+              rotateY(radians(mouseX * 0.1));
+              rotateX(radians(mouseY * 0.1));
+              fill(200 + n, 120 - n * 2, 120 - n * 2);
+              box();
+              pop();
+            }
+          }
+        }
+      }
+
+      function windowResized() {
+        resizeCanvas(windowWidth - 20, windowHeight - 20);
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

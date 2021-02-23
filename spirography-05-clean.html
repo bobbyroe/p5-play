@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <link rel="stylesheet" href="basic-style.css" />
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      let paper;
+      
+      function getNumLoops(a, b, c, d) {
+        if (!c) {
+          c = a;
+        }
+        if (!d) {
+          d = b;
+        }
+        let dividend = Math.max(a, b);
+        let divisor = Math.min(a, b);
+        let quotient = Math.floor(dividend / divisor);
+        let remainder = dividend % divisor;
+        let numLoops = 0;
+        if (remainder === 0) {
+          numLoops = (c * d) / divisor / d;
+        } else {
+          numLoops = getNumLoops(divisor, remainder, c, d);
+        }
+        return numLoops;
+      }
+
+      const scaleFactor = 5;
+      const ringCircumference = 96 * scaleFactor;
+      const wheelCircumference = 56 * scaleFactor;
+      const radius = ringCircumference - wheelCircumference;
+      let fraction = 1; // 'fraction' corresponds to the 'hole' on the wheel;
+      const ratio = ringCircumference / wheelCircumference - 1;
+      const rate = (1 / ratio) * 0.1; // speed of drawing & curve fidelity
+      let prevPen;
+      let counter = 0;
+      const numLoops = getNumLoops(ringCircumference, wheelCircumference);
+      const counterMaxMult = Math.PI * 2 * numLoops / (ratio + 1);
+    
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+    
+        colorMode(HSB);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+      }
+
+      function draw() {
+        let x = mid.x;
+        let y = mid.y;
+        let pen = {
+          x:
+            x +
+            radius * cos(counter) +
+            fraction * wheelCircumference * cos(counter * ratio),
+          y:
+            y +
+            radius * sin(counter) -
+            fraction * wheelCircumference * sin(counter * ratio),
+        };
+        if (prevPen === undefined) {
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+        
+        if (paused === false) {
+          counter += rate;
+          stroke(counter * 2, 100, 100);
+          strokeWeight(1);
+          line(prevPen.x, prevPen.y, pen.x, pen.y);
+
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+          
+          if (counter >= counterMaxMult) {
+            counter = 0;
+            fraction -= 0.2;
+            prevPen = undefined;
+          }
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

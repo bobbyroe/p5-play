@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 2 5s linear infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script src="libs/gsap.min.js"></script>
+    <script>
+      let paused = false;
+
+      let time = 0;
+      let isExpanded = false;
+      let lines;
+      const lineObjs = [];
+      let numElipses = 0;
+
+      function preload() {
+        lines = loadJSON("assets/drawing-data/boxes.json");
+      }
+
+      function getLineObj(n) {
+        const lines = [];
+        const hue = random(360);
+        const pos = { x: 0, y: 0 };
+        const randomPos = { x: 0, y: 0 };
+        let currentPos = { x: 0, y: 0 };
+        let goalPos = { x: 0, y: 0 };
+        const roteRate = random(0.0005, 0.002);
+        function update(t) {
+          goalPos = isExpanded ? randomPos : pos;
+          currentPos.x -= (currentPos.x - goalPos.x) * 0.05;
+          currentPos.y -= (currentPos.y - goalPos.y) * 0.05;
+          push();
+          translate(currentPos.x, currentPos.y);
+          // rotate(millis() * roteRate);
+          // middle point
+
+          // ellipse(0, 0, 5);
+          //
+
+          lines.forEach((l) => {
+            const { coords } = l;
+            const { x, y, s } = coords;
+            fill(s * 20, 255, 255);
+            ellipse(x - pos.x, y - pos.y, s);
+            numElipses += 1;
+          });
+          pop();
+        }
+        return {
+          pos,
+          randomPos,
+          currentPos,
+          lines,
+          update,
+        };
+      }
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        noStroke();
+
+        const keys = Object.keys(lines);
+
+        keys.forEach((key, n) => {
+          const l = lines[key];
+          const lineObj = getLineObj(n);
+          const avgPos = { x: 0, y: 0 };
+          l.forEach((pos, i) => {
+            let { x, y, s } = pos;
+            avgPos.x += x;
+            avgPos.y += y;
+            if (i === 0) {
+              if (random() < 0.5) {
+                lineObj.randomPos.x =
+                  random() < 0.5
+                    ? random(0, -250)
+                    : random(windowWidth, windowWidth + 250);
+                lineObj.randomPos.y = random(windowHeight);
+              } else {
+                lineObj.randomPos.x = random(windowWidth);
+                lineObj.randomPos.y =
+                  random() < 0.5
+                    ? random(0, -250)
+                    : random(windowHeight, windowHeight + 250);
+              }
+            }
+            lineObj.currentPos.x = x;
+            lineObj.currentPos.y = y;
+            lineObj.lines.push({ coords: { x, y, s, i } });
+          }); // end forEach();
+          lineObj.pos.x = round(avgPos.x / l.length);
+          lineObj.pos.y = round(avgPos.y / l.length);
+          lineObjs.push(lineObj);
+        });
+      }
+
+      function draw() {
+        time += 1;
+
+        if (paused === false) {
+          clear();
+          lineObjs.forEach((l) => l.update(time));
+        }
+      }
+
+      function keyPressed() {
+        const SPACE = 32;
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+          console.log("numElipses", numElipses);
+        }
+        if (keyCode === SPACE) {
+          isExpanded = !isExpanded;
+          time = 0;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <link rel="stylesheet" href="basic-style.css" />
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let mid = { x: 0, y: 0 };
+      let paper;
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        mid = {
+          x: windowWidth * 0.5,
+          y: windowHeight * 0.5,
+        };
+        // "2nd canvas"
+        paper = createGraphics(windowWidth - 20, windowHeight - 20);
+        paper.colorMode(HSB);
+        paper.noFill();
+        paper.strokeWeight(2);
+        paper.stroke(180, 100, 100);
+
+        colorMode(HSB);
+        noFill();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+      }
+      function getNumLoops(a, b, c, d) {
+        if (!c) {
+          c = a;
+        }
+        if (!d) {
+          d = b;
+        }
+        let dividend = Math.max(a, b);
+        let divisor = Math.min(a, b);
+        let quotient = Math.floor(dividend / divisor);
+        let remainder = dividend % divisor;
+        let numLoops = 0;
+        if (remainder === 0) {
+          numLoops = (c * d) / divisor / d;
+        } else {
+          numLoops = getNumLoops(divisor, remainder, c, d);
+        }
+        return numLoops;
+      }
+
+      function drawRingAndWheel() {
+        clear();
+        stroke(0, 0, 100);
+        strokeWeight(0.5);
+        circle(mid.x, mid.y, ringCircumference);
+        // inner circle
+        push();
+        stroke(0, 100, 100);
+        strokeWeight(1);
+        translate(
+          mid.x + cos(counter) * (radius * 0.5),
+          mid.y + sin(counter) * (radius * 0.5)
+        );
+        rotate(-PI * counter);
+        circle(0, 0, wheelCircumference);
+        line(0, 0, wheelCircumference * 0.5, 0);
+        pop();
+      }
+
+      const scaleFactor = 5;
+      const ringCircumference = 96 * scaleFactor;
+      const wheelCircumference = 56 * scaleFactor;
+      const radius = ringCircumference - wheelCircumference;
+      let fraction = 1; // 'fraction' corresponds to the 'hole' on the wheel;
+      const ratio = ringCircumference / wheelCircumference - 1;
+      const rate = (1 / ratio) * 0.1; // speed of drawing & curve fidelity
+      let prevPen;
+      let counter = 0;
+      const numLoops = getNumLoops(ringCircumference, wheelCircumference);
+
+      const counterMaxMult = Math.PI * 2 * numLoops / (ratio + 1);
+
+      let ringPenPrev;
+
+      function draw() {
+        let x = mid.x;
+        let y = mid.y;
+        let pen = {
+          x:
+            x +
+            radius * cos(counter) +
+            fraction * wheelCircumference * cos(counter * ratio),
+          y:
+            y +
+            radius * sin(counter) -
+            fraction * wheelCircumference * sin(counter * ratio),
+        };
+        if (prevPen === undefined) {
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+        }
+        let ringPen = {
+          x: x + cos(counter) * ringCircumference,
+          y: y + sin(counter) * ringCircumference,
+        };
+        if (ringPenPrev === undefined) {
+          ringPenPrev = {
+            x: ringPen.x,
+            y: ringPen.y,
+          };
+        }
+        if (paused === false) {
+          // drawRingAndWheel();
+          // line(ringPen.x, ringPen.y, ringPenPrev.x, ringPenPrev.y);
+          counter += rate;
+          paper.stroke(counter * 2, 100, 100);
+          paper.strokeWeight(1);
+
+          paper.line(prevPen.x, prevPen.y, pen.x, pen.y);
+          image(paper, 0, 0);
+
+          prevPen = {
+            x: pen.x,
+            y: pen.y,
+          };
+          ringPenPrev = {
+            x: ringPen.x,
+            y: ringPen.y
+          };
+          if (counter >= counterMaxMult) {
+            counter = 0;
+            fraction -= 0.2;
+          }
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+          console.log(counter, TAU * numLoops / (ratio + 1));
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

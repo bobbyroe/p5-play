@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let middle;
+      function setup() {
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        // textSize(72);
+        fill(255, 255, 255);
+        textAlign(CENTER, CENTER);
+      }
+
+      function draw() {
+        const dist = { 
+            x: Math.abs(mouseX - middle.x),
+            y: Math.abs(mouseY - middle.y)
+        };
+        const fontSize = (dist.x + dist.y) * 0.4;
+        textSize(fontSize);
+        background("rgba(0, 0, 0, 0.01)");
+        fill(fontSize, fontSize, fontSize);
+        translate(mouseX, mouseY);
+        rotate(millis() * 0.01);
+        text(Math.floor(fontSize), 0, 0);
+        console.log(fontSize);
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

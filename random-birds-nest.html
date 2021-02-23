@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let middle;
+      let pos = { x: 0, y: 0 };
+      let anchorPos = { x: 0, y: 0 };
+      let endPos = { x: 0, y: 0 };
+      let endAnchorPos = { x: 0, y: 0 };
+      // let mirrorAnchor = { x: 0, y: 0 };
+      let numCircles = 30;
+      let size = 300; // "radius" of the random arcs
+      function setup() {
+        noFill();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        pos.x = random(size, -size) + middle.x;
+        pos.y = random(size, -size) + middle.y;
+        anchorPos.y = random(size, -size) + middle.y;
+        anchorPos.x = random(size, -size) + middle.x;
+
+        for (let i = 0; i < numCircles; i++) {
+          endPos.x = random(size, -size) + middle.x;
+          endPos.y = random(size, -size) + middle.y;
+          endAnchorPos.y = random(size, -size) + middle.y;
+          endAnchorPos.x = random(size, -size) + middle.x;
+
+          // strokeWeight(1);
+          // stroke(0, 255, 255);
+          // line(pos.x, pos.y, anchorPos.x, anchorPos.y);
+
+          strokeWeight(random(0.5, 2));
+          stroke(random(160, 255), 50, 255);
+          bezier(
+            pos.x,
+            pos.y,
+            anchorPos.x,
+            anchorPos.y,
+            endAnchorPos.x,
+            endAnchorPos.y,
+            endPos.x,
+            endPos.y
+          );
+          pos.x = endPos.x;
+          pos.y = endPos.y;
+          anchorPos.x = pos.x - (endAnchorPos.x - pos.x);
+          anchorPos.y = pos.y - (endAnchorPos.y - pos.y);
+        }
+      }
+      // continuous loop
+      function draw() {
+        if (paused === false) {
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
