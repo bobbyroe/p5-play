@@ -48,6 +48,7 @@ function drawSpirograph(opts) {
   let counter = 0;
   const numLoops = getNumLoops(ringCircumference, wheelCircumference);
   const counterMax = (Math.PI * 2 * numLoops) / (ratio + 1.0) + 0.2;
+  const clampValue = 1;
 
   guidePaper.push();
   guidePaper.translate(x, y);
@@ -57,11 +58,11 @@ function drawSpirograph(opts) {
     pen = {
       x:
         x +
-        radius * cos(counter) +
+        radius * constrain(cos(counter), -clampValue, clampValue) +
         fraction * wheelCircumference * cos(counter * ratio),
       y:
         y +
-        radius * sin(counter) -
+        radius * constrain(sin(counter), -clampValue, clampValue) -
         fraction * wheelCircumference * sin(counter * ratio),
     };
     if (prevPen === undefined) {
@@ -214,7 +215,7 @@ function pattern1() {
   while (n < numSteps) {
     options.fraction -= 0.02;
     options.rotation += 2;
-    options.hue += 4;
+    options.hue += 3;
     drawSpirograph(options);
     saveToPaper();
     n += 1;
@@ -235,9 +236,9 @@ function keyPressed() {
   if (keyCode === S) {
     saveToPaper();
   }
-  if (keyCode === SPACE) {
-    saveCanvas("Spirography-xxxx", "png");
-  }
+  // if (keyCode === SPACE) {
+  //   saveCanvas("Spirography-xxxx", "png");
+  // }
   if (keyCode === tilde) {
     toggleControls();
   }

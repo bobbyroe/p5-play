@@ -21,6 +21,9 @@ body {
     background-position: 0;
   }
 }
+.gray-gradient {
+  background-image: linear-gradient(#99A2A2, #556060);
+}
 footer {
   background-color: rgba(0, 0, 0, 0.4);
   display: block;
@@ -48,8 +51,13 @@ p {
 }
 
 .radio-buttons input[type="radio"] {
-  display: none;
+  /* display: none; */
+  position: absolute;
+  left: -9999px;
+  clip: rect(1px, 1px, 1px, 1px);
+  overflow: hidden;
 }
+
 .radio-buttons label {
   display: inline-block;
   background-color: rgba(255, 255, 255, 0.05);
