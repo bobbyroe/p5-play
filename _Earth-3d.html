@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url('assets/space.png');
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let earthTex;
+      let paused = false;
+      let theta = 0;
+      function setup() {
+        earthTex = loadImage("assets/earthmap1k.jpg");
+        createCanvas(windowWidth - 20, windowHeight - 20, WEBGL);
+        // drawingContext.filter = "drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))";
+        noStroke();
+      }
+      // continuous loop
+      function draw() {
+        if (paused === false) {
+          // directionalLight(28, 28, 28, -1, -1, -1);
+          // directionalLight(255, 255, 255, 1, 1, 1);
+          directionalLight(255, 255, 255, 1, 1, 0.5);
+          directionalLight(255, 255, 255, 1, 1, 0.5);
+          translate(-220, 0, 0);
+          rotateZ(-0.2);
+          rotateX(-0.2);
+          push();
+          
+          // rotateX(theta * 0.1);
+          rotateY(theta * 0.1);
+          texture(earthTex);
+          sphere(250, 32, 32);
+          pop();
+          theta += 0.05;
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

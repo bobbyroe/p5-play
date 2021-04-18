@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contents</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 2rem;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        50% {
+          background-position: 100%;
+        }
+        100% {
+          background-position: 0;
+        }
+      }
+      .links {
+        position: absolute;
+        top: 400px;
+      }
+      ul {
+        margin-top: 0;
+        margin-left: 2rem;
+      }
+      li {
+        margin-bottom: 1rem; 
+      }
+      a:visited {
+        color: #0099FF;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let letters = [];
+      let spirals = [];
+
+      const fontData = {
+        A: [
+          [30, 0],
+          [60, 0],
+          [90, 30],
+          [90, 100],
+          [60, 100],
+          [60, 80],
+          [30, 80],
+          [30, 100],
+          [0, 100],
+          [0, 30],
+          [30, 0],
+        ],
+        C: [
+          [0, 0],
+          [90, 0],
+          [90, 30],
+          [30, 30],
+          [30, 70],
+          [90, 70],
+          [90, 100],
+          [0, 100],
+          [0, 0],
+        ],
+        D: [
+          [0, 0],
+          [50, 0],
+          [80, 30],
+          [80, 70],
+          [50, 100],
+          [0, 100],
+          [0, 0],
+        ],
+        E: [
+          [0, 0],
+          [90, 0],
+          [90, 30],
+          [30, 30],
+          [30, 35],
+          [90, 35],
+          [90, 65],
+          [30, 65],
+          [30, 70],
+          [90, 70],
+          [90, 100],
+          [0, 100],
+          [0, 0],
+        ],
+        O: [
+          [0, 0],
+          [80, 0],
+          [80, 100],
+          [0, 100],
+          [0, 0],
+        ],
+        R: [
+          [0, 0],
+          [60, 0],
+          [90, 30],
+          [90, 60],
+          [60, 60],
+          [90, 100],
+          [55, 100],
+          [30, 65],
+          [30, 100],
+          [0, 100],
+          [0, 0],
+        ],
+        T: [
+          [0, 0],
+          [90, 0],
+          [90, 30],
+          [60, 30],
+          [60, 100],
+          [30, 100],
+          [30, 30],
+          [0, 30],
+          [0, 0],
+        ],
+      };
+      const fontContourData = {
+        A: [
+          [45, 30],
+          [60, 45],
+          [60, 55],
+          [30, 55],
+          [30, 45],
+          [45, 30],
+        ],
+        D: [
+          [30, 30],
+          [35, 30],
+          [50, 45],
+          [50, 55],
+          [35, 70],
+          [30, 70],
+          [30, 30],
+        ],
+        O: [
+          [30, 30],
+          [50, 30],
+          [50, 70],
+          [30, 70],
+          [30, 30],
+        ],
+        R: [
+          [30, 30],
+          [50, 30],
+          [60, 40],
+          [30, 40],
+          [30, 30],
+        ],
+      };
+      let startX = 30;
+      let startY = 20;
+      const fontProps = [
+        { char: "C", hue: 130, x: startX, y: startY, delay: 0 },
+        { char: "O", hue: 150, x: startX + 95, y: startY, delay: 500 },
+        { char: "D", hue: 160, x: startX + 180, y: startY, delay: 1000 },
+        { char: "E", hue: 180, x: startX + 265, y: startY, delay: 1500 },
+        { char: "A", hue: 210, x: startX + 370, y: startY, delay: 2000 },
+        { char: "R", hue: 230, x: startX + 465, y: startY, delay: 2500 },
+        { char: "T", hue: 270, x: startX + 560, y: startY, delay: 3000 },
+      ];
+      function getLetter(props) {
+        const { char, hue, x, y, delay, arr } = props;
+        const verts = arr[char].slice();
+        const totalVerts = verts.length - 1;
+        const curVerts = [verts.shift()];
+
+        // initialize
+        let curIndex = 0;
+        let startPos = curVerts[curIndex];
+        let curPos = curVerts[curIndex];
+        let goalPos = curVerts[curIndex];
+        let amt = 0;
+        let amtInc = 0.05;
+        const rate = 0.002;
+
+        function calcAmtInc() {
+          let [startX, startY] = startPos;
+          let [goalX, goalY] = goalPos;
+          return (115 - max(abs(goalX - startX), abs(goalY - startY))) * rate;
+        }
+
+        function moveVertex() {
+          amt += amtInc;
+          let curAmt = min(amt, 1);
+          let [startX, startY] = startPos;
+          let [goalX, goalY] = goalPos;
+          return [lerp(startX, goalX, curAmt), lerp(startY, goalY, curAmt)];
+        }
+
+        function addVertex() {
+          curVerts.push(verts.shift());
+          startPos = curVerts[curIndex];
+          curPos = curVerts[curIndex];
+          curIndex += 1;
+          amt = 0;
+          goalPos = curVerts[curIndex];
+          amtInc = calcAmtInc();
+        }
+
+        function update() {
+          if (millis() > delay) {
+            curPos = moveVertex();
+            let [cx, cy] = curPos;
+            let [gx, gy] = goalPos;
+            if (abs(cx - gx) < 0.1 && abs(cy - gy) < 0.1) {
+              if (curIndex >= totalVerts) {
+                // nope;
+                if (char === 'T') {
+                  showLinks();
+                }
+              } else {
+                addVertex();
+              }
+            }
+
+            push();
+            translate(x, y);
+            stroke(hue, 100, 250);
+            beginShape();
+            curVerts.forEach((p, i) => {
+              const [px, py] = i === curIndex ? curPos : p;
+              vertex(px, py);
+            });
+            endShape();
+            pop();
+          }
+        }
+        return {
+          update,
+        };
+      }
+
+      function getLetters () {
+        const letterObjects = []
+        fontProps.forEach( l => {
+          const { char } = l;
+          // add letters
+          letterObjects.push(getLetter({...l, arr: fontData}));
+          // add contours
+          if (fontContourData[char]) {
+            letterObjects.push(getLetter({...l, arr: fontContourData}));
+          }
+        });
+        return letterObjects;
+      }
+      
+
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+        stroke(0, 100, 100);
+        strokeWeight(1);
+        noFill();
+        
+        letters = getLetters();
+      }
+
+      function draw() {
+        clear();
+        if (paused === false) {
+          scale(2);
+          letters.forEach((l) => l.update());
+        }
+      }
+
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+
+      function showLinks () {
+        const linksEl = document.querySelector('.links');
+        linksEl.classList.remove('hidden');
+      }
+    </script>
+  </head>
+  <body>
+    <div class="links hidden">
+    <ul>
+      <li><a href="./swirly-02.html" target="_blank">swirly circles</a></li>
+      <li><a href="./swirling-circle-lines.html" target="_blank">pretty concentric circles</a>
+      <li><a href="./spirography-06-oscillating.html" target="_blank">oscillating spirography</a>
+      <li><a href="./spirography-05-clean.html" target="_blank">magic spirography</a>
+      <li><a href="./spinningText.html" target="_blank">spinning text, animated</a>
+      <li><a href="./letters-small-anim-01.html" target="_blank">magic drawn sentences</a>
+      <li><a href="./emoji-grid-prox.html" target="_blank">squirmy emoji grid</a>
+      <li><a href="./box-filling-sine.html" target="_blank">undulating boxes</a>
+      <li><a href="./autodraw-04-slow.html" target="_blank">automatic drawing</a>
+      <li><a href="./anim-comps-02.html" target="_blank">animated colorful boxes</a>
+      <li><a href="./3d-grid-05.html" target="_blank">pretty spinning cubes</a></li>
+      <li><a href="./_shape-masking-02a" target="_blank">start</a></li>
+    </ul>
+  </div>
+  </body>
+</html>

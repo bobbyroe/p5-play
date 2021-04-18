@@ -258,13 +258,13 @@
         ],
       };
 
-      let x = 120;
-      const alpha = "THE QUICK BROWN FOX JUMPED LAZILY OVER THE FENCE";
+      // let x = 60;
+      const alpha = "THIS ISHT IS FRICKIN AWESOME";
       const alphaArray = alpha.split("");
       const fontProps = alphaArray.map((char, i) => {
-        const hue = i * 4;
-        const x = 20 + (i % 30) * 50;
-        const y = i < 30 ? 200 : 255;
+        const hue = i * 5;
+        const x = 10 + (i % 30) * 50;
+        const y = i < 30 ? 400 : 455;
         const delay = i * 100;
         return { char, hue, x, y, delay };
       });

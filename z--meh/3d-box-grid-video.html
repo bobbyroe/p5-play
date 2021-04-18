@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <link rel="stylesheet" href="basic-style.css" />
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let startPos = {};
+      function setup() {
+        createCanvas(windowWidth, windowHeight, WEBGL);
+        colorMode(HSB);
+        startPos = {
+          x: windowWidth * -0.35,
+          y: windowWidth * -0.35,
+        };
+      }
+      const numRows = 10;
+      let n = 0;
+      function draw() {
+        clear();
+        for (let r = 0; r < numRows; r += 1) {
+          n = abs(numRows * 0.5 - r) * 5;
+          push();
+          translate(startPos.x, startPos.y, sin(n + frameCount * 0.05) * 100);
+          rotateX(millis() * 0.001);
+          rotateY(millis() * 0.001);
+          box();
+          pop();
+        }
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

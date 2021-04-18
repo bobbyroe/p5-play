@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let ship;
+
+      function getShip() {
+        let center = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        let goalCenter = { x: 0, y: 0 };
+        let delta = { x: 0, y: 0 };
+        let goal = { x: 0, y: 0 };
+        let angle = 0;
+        let direction = 1;
+        let shipAngle = random(TWO_PI);
+        let randomDist = random(100, 300);
+        let speed = 0.5;
+        let pos = {
+          x: center.x + cos(shipAngle) * randomDist,
+          y: center.y + sin(shipAngle) * randomDist,
+        };
+
+        function update() {
+          let { x, y } = pos;
+
+          if (random() < 0.03) {
+            direction = random() < 0.5 ? -1 : 1;
+            speed = random(0.05, 0.2);
+            randomDist = random(10, 300);
+          }
+          if (random() < 0.03) {
+            goalCenter = {
+              x: random() * (windowWidth - 200) + 100,
+              y: random() * (windowHeight - 200) + 100,
+            };
+          }
+
+          shipAngle += direction * speed;
+          center.x -= (center.x - goalCenter.x) * 0.3;
+          center.y -= (center.y - goalCenter.y) * 0.3;
+          goal = {
+            x: center.x + cos(shipAngle) * randomDist,
+            y: center.y + sin(shipAngle) * randomDist,
+          };
+          delta = {
+            x: goal.x - pos.x,
+            y: goal.y - pos.y,
+          };
+          angle = atan2(-delta.x, delta.y);
+          pos.x -= (pos.x - goal.x) * speed;
+          pos.y -= (pos.y - goal.y) * speed;
+        }
+
+        function draw() {
+          let { x, y } = pos;
+          clear();
+          strokeWeight(2.0);
+          push();
+          translate(x, y);
+          rotate(angle);
+          line(10, -15, 0, 15); // /
+          line(0, 15, -10, -15); // \
+          line(10, -15, 0, -9); // /
+          line(0, -9, -10, -15); // \
+          pop();
+        }
+        return {
+          update,
+          draw,
+        };
+      }
+      function setup() {
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        strokeWeight(2.0);
+        stroke(100, 100, 255);
+        colorMode(HSB);
+
+        ship = getShip();
+      }
+
+      function draw() {
+        ship.update();
+        ship.draw();
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

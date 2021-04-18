@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>P5</title>
+    <style>
+      body {
+        margin: 10px;
+        padding: 0;
+        background-color: #202020;
+        background: url("assets/space.png");
+        animation: slowspin 25s infinite;
+      }
+      @keyframes slowspin {
+        0% {
+          background-position: 0;
+        }
+        100% {
+          background-position: 100%;
+        }
+      }
+    </style>
+    <script src="libs/p5.min.js"></script>
+    <script>
+      let paused = false;
+      let middle;
+      let pos = { x: 0, y: 0 };
+      let numCircles = 100;
+      let alpha = 0;
+      const circles = [];
+
+      function makeCircle(n) {
+        let pos = {
+          x: random(500, -500) + middle.x,
+          y: random(500, -500) + middle.y,
+        };
+        let rate = random(0.4, 4);
+        return {
+          col: { r: random(100, 200), g: 255, b: 128, a: rate * 0.25 },
+          pos,
+          diameter: rate * 40,
+          update() {
+            pos.x += sin(millis() * 0.001) * rate;
+          },
+        };
+      }
+
+      function setup() {
+        noStroke();
+        middle = { x: windowWidth * 0.5, y: windowHeight * 0.5 };
+        createCanvas(windowWidth - 20, windowHeight - 20);
+        colorMode(HSB);
+
+        for (let i = 0; i < numCircles; i++) {
+          circles.push(makeCircle(i));
+        }
+        circles.sort((a, b) => a.diameter - b.diameter);
+      }
+      // continuous loop
+      function draw() {
+        if (paused === false) {
+          background("rgba(0, 0, 0, 1)");
+          circles.forEach((c) => {
+            const { col, pos, diameter } = c;
+            const { r, g, b, a } = col;
+            fill(r, g, b, a);
+            circle(pos.x, pos.y, diameter);
+            c.update();
+          });
+        }
+      }
+      function keyPressed() {
+        if (keyCode === ESCAPE) {
+          paused = !paused;
+        }
+        return false;
+      }
+    </script>
+  </head>
+  <body></body>
+</html>
